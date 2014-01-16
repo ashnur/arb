@@ -1,0 +1,35 @@
+{
+  "name": "arb",
+  "version": "0.0.0",
+  "description": "arbitrary precision number types and operations on them",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test/*.js"
+  },
+  "keywords": [
+    "bignumbers",
+    "bigintegers",
+    "bignum",
+    "bigint",
+    "arbitrary",
+    "precision",
+    "precise",
+    "arithmethic",
+    "complex",
+    "numbers",
+    "polynumbers"
+  ],
+  "author": "ashnur",
+  "license": "ISC",
+  "devDependencies": {
+    "tape": "~2.3.2",
+    "claire": "~0.4.1"
+  },
+  "dependencies": {
+    "typedarray-pool": "~0.1.2",
+    "bit-array": "~0.2.2"
+  }
+}
