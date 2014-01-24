@@ -9,7 +9,7 @@ type          | length  |  value
 
 # Fra
 type    | numerator | denominator
-10      | Nat       | Nat
+01      | Nat       | Nat
 
 # Rat
 type    | numerator | denominator
@@ -18,7 +18,7 @@ type    | numerator | denominator
 
 # PNat
 type    | dim count | dim lengths   | value
-100     | 256       | list of 2^32  | list of Nats
+001     | 256       | list of 2^32  | list of Nats
 
 # PInt
 type    | dim count | dim lengths   | value
@@ -26,7 +26,7 @@ type    | dim count | dim lengths   | value
 
 # PFra
 type    | numerator | denominator
-110     | PNat      | PNat
+011     | PNat      | PNat
 
 # PRat
 type    | numerator | denominator
