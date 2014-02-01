@@ -16,7 +16,7 @@ void function(){
   var zero = require('../zero.js')()
 
   function print(n, arr){
-    return n+' '+join(arr, ', ')
+    return log(n,join(arr, ', '))
   }
 
   function associativity(a, b, c){
@@ -35,6 +35,7 @@ void function(){
     test(property.title, function(t){
       var results = check(1000, property.checks)
       results.failed.forEach(function(result){
+        if (result.value.stack) console.log(result.value.stack)
         t.fail('==> '+ results.passed.length+' passed, '+', 1 failed with arguments: ' + JSON.stringify(result.arguments))
       })
       if ( results.failed.length == 0 ) {

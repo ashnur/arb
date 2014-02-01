@@ -5,16 +5,19 @@ void function(){
 
 
   var rand_bool = rn.bind(null, {integer:true})
-  var rand_small_nat = rn.bind(null, {min: 0, max: 10, integer:true})
+  var rand_small_nat = rn.bind(null, {min: 1, max: 10, integer:true})
   var rand_large = rn.bind(null, {min: 1, max:65535, integer:true})
   var rand_large_nat = rn.bind(null, {min: 1, max:65535, integer:true})
 
 
   function random_int(length, s){
+    length = length || rand_small_nat()
     var arr = pool('integer', length)
-    s = s == null ? rand_bool() : s
-    sign.change(arr, s)
-    if ( length > 0 ) arr[2] = rand_large_nat()
+    if ( length > 0 ) {
+      arr[2] = rand_large_nat()
+      s = s == null ? rand_bool() : s
+      sign.change(arr, s)
+    }
     for ( var i = 3; i < length + 2; i ++ ) {
       arr[i] = rand_large()
     }
