@@ -49,6 +49,7 @@ void function(){
       for ( i = 2; i < ls; i++ ) {
         R_shrink[i] = R[i]
       }
+      pool.free(R)
       return R_shrink
 
     }

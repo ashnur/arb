@@ -16,7 +16,7 @@ void function(){
     return this[1] ? (sign.read(this)?'-':'+') + join(slice(this,2), '|') : '0'
   }
 
-  module.exports = function(t, size, value){
+  function create(t, size, value){
     var length = size + 2
     var arr = uint16(length)
     arr.toString = toString
@@ -27,7 +27,7 @@ void function(){
     }
     return arr
   }
-
+  module.exports = create
   module.exports.free = free16
   module.exports.uint32 = uint32
   module.exports.freeUint32 = free32

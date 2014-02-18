@@ -5,9 +5,9 @@ void function(){
   var add = require('./integer_addition.js')
   var subtract = require('./integer_subtraction.js')
   var multiply = require('./integer_multiplication.js')
-  var divide = require('./integer_division.js')
-  var one = require('./one.js')()
-  var zero = require('./zero.js')()
+  //var divide = require('./integer_division.js')
+  var one = require('./one.js')
+  var zero = require('./zero.js')
   var compare = require('./integer_compare_abs.js')
   var equal = require('./integer_equality.js')
   var sign = require('./sign.js')
@@ -71,6 +71,6 @@ void function(){
   module.exports.add = addition
   module.exports.subtract = subtraction
   module.exports.multiply = multiplication
-  module.exports.divide = division
+  //module.exports.divide = division
 
 }()

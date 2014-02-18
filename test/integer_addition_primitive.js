@@ -1,88 +1,63 @@
+require("better-stack-traces").install({
+  before: 2, // number of lines to show above the error
+  after: 3, // number of lines to show below the error
+  maxColumns: 80, // maximum number of columns to output in code snippets
+  collapseLibraries: /node_modules/ // omit code snippets from paths that match the given regexp (ignores node_modules by default)
+})
 void function(){
   var add = require('../integer_addition.js')
   var addp = require('../integer_add_primitive.js')
-  var rand_int = require('./rand_int.js')
-  var test = require('tape')
+  var rand_int = require('./helpers/rand_int.js')
   var claire = require('claire')
-  var for_all = claire.forAll
-  var check = claire.check
   var as_generator = claire.asGenerator
   var arb_int = as_generator(rand_int.positive)
+  var arb_int = as_generator(rand_int('small', 'simple', 'positive'))
+  var rn = require('random-number')
+  var simple_numbers = rn.generator({min: 0, max: 9, integer: true})
+  var large_numbers = rn.generator({min: 0, max: Math.pow(2,53), integer: true})
+  var arb_primitive = as_generator(function(){return large_numbers()})
+  var bygen = as_generator(function(){return simple_numbers()})
   var equal = require('../integer_equality.js')
   var liberate = require('liberate')
   var join = liberate(Array.prototype.join)
-  var pool = require('../pool.js')
   var log = console.log.bind(console)
-  var rn = require('random-number')
   var zero = require('../zero.js')
-  var rn_opts = {min:0, max: Math.pow(2,53), integer: true}
-  var by_opts = {min:0, max: 100, integer: true}
-  var arb_primitive = as_generator(function(){ return rn(rn_opts) })
-  var bygen = as_generator(function(){ return rn(by_opts) })
   var to_int = require('../primitive_to_int.js')
+  var klara = require('./claire-helpers/klara.js')
+  var left_pad = require('../left_pad.js')
+  var analyzer = require('./claire-helpers/analyzer.js')
 
   function print(n, arr){
     return log(n, join(arr, ', '))
   }
 
-  var left_pad = require('../left_pad.js')
-
   function associativity(a, b, c){
-    var bc = addp(b, c, 0)
-    var a_bc = add(a, bc)
+    var bc = addp(b, c)
     var ab = add(a, b)
-    var ab_c = addp(ab, c, 0)
-    var r = equal(a_bc, ab_c)
-    if ( ! r ) {
-      print('b', b)
-      log('c', c)
-      print('bc', bc)
-      print('a', a)
-      print('a_bc', a_bc)
-      print('a', a)
-      print('b', b)
-      print('ab', ab)
-      log('c', c)
-      print('ab_c', ab_c)
-    }
-    return  r
+    var a_bc = add(a, bc)
+    var ab_c = addp(ab, c)
+    return  equal(a_bc,ab_c )
   }
 
   function shift(A, P, by){
-    var B = left_pad(to_int(P), by)
-    var n = add(A, B)
-    var m = addp(A, P, by)
-    var r = equal(n, m)
-    if ( ! r ) {
-      log('by', by)
-      print('A', A)
-      log('P', P)
-      print('B', B)
-      print('n', n)
-      print('m', m)
-    }
-    return r
+    return equal(add(A, left_pad(to_int(P), by)), addp(A, P, by))
   }
 
-  function check_property(property){
-    test(property.title, function(t){
-      var results = check(2000, property.checks)
-      results.failed.forEach(function(result){
-        if (result.value.stack) console.log(result.value.stack)
-        t.fail('==> '+ results.passed.length+' passed, '+', 1 failed with arguments: ' + JSON.stringify(result.arguments))
-      })
-      if ( results.failed.length == 0 ) {
-        t.pass(results.passed.length+' passed, '+results.ignored.length+' ignored')
-      }
-      t.end()
-    })
-  }
-  ;[{ title : 'associativity'
-    , checks: for_all(arb_int, as_generator(zero), arb_primitive).satisfy(associativity)
+  var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
+  var int_analyzer = require('./claire-helpers/analyze_int.js')
+
+  var props = [
+    { title : 'associativity'
+    , fn: associativity
+    , args:  [arb_int, as_generator(function(){ return zero}), arb_primitive]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, int_analyzer)
     }
   , { title : 'shift'
-    , checks: for_all(arb_int,  arb_primitive, bygen).satisfy(shift)
+    , fn: shift
+    , args: [arb_int, arb_primitive, bygen]
+    , analyze: analyzer(bigint_analyzer, int_analyzer, int_analyzer)
     }
-  ].forEach(check_property)
+  ]
 
+  klara(2000, props)
 }()

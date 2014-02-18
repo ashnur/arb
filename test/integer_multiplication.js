@@ -1,19 +1,17 @@
 void function(){
   var multiply = require('../integer_multiplication.js')
-  var rand_int = require('./rand_int.js')
-  var test = require('tape')
+  var rand_int = require('./helpers/rand_int.js')
   var claire = require('claire')
-  var for_all = claire.forAll
-  var check = claire.check
   var as_generator = claire.asGenerator
-  var arb_int = as_generator(rand_int.positive)
+  //var arb_int = as_generator(rand_int.positive)
+  var arb_int = as_generator(rand_int.static_generator([1,9], 'complex', 'positive'))
   var equal = require('../integer_equality.js')
+  var one = require('../one.js')
   var liberate = require('liberate')
   var join = liberate(Array.prototype.join)
-  var pool = require('../pool.js')
   var log = console.log.bind(console)
-
-  var one = require('../one.js')()
+  var klara = require('./claire-helpers/klara.js')
+  var analyzer = require('./claire-helpers/analyzer.js')
 
   function print(n, arr){
     return log(n+' '+join(arr, ', '))
@@ -57,31 +55,26 @@ void function(){
     return equal(multiply(a, one), a)
   }
 
-  function check_property(property){
-    test(property.title, function(t){
-      var results = check(300, property.checks)
-      results.failed.forEach(function(result){
-        if (result.value.stack) console.log(result.value.stack)
-        t.fail('==> '+ results.passed.length+' passed, '+', 1 failed with arguments: ' + JSON.stringify(result.arguments))
-      })
-      if ( results.failed.length == 0 ) {
-        t.pass(results.passed.length+' passed, '+results.ignored.length+' ignored')
-      }
-      t.end()
-    })
-  }
+  var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
 
-  ;[
-
-  { title : 'commutativity'
-    , checks: for_all(arb_int, arb_int).satisfy(commutativity)
+  var props = [
+    { title : 'identity'
+    , fn: identity
+    , args: [arb_int]
+    , analyze: analyzer(bigint_analyzer)
+    }
+  , { title : 'commutativity'
+    , fn: commutativity
+    , args: [arb_int, arb_int]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer)
     }
   ,
-  { title : 'associativity'
-    , checks: for_all(arb_int, arb_int, arb_int).satisfy(associativity)
+    { title : 'associativity'
+    , fn: associativity
+    , args: [arb_int, arb_int, arb_int]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
-  , { title : 'identity'
-    , checks: for_all(arb_int).satisfy(identity)
-    }
-  ].forEach(check_property)
+  ]
+
+  klara(1000, props)
 }()

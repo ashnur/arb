@@ -1,22 +1,19 @@
 void function(){
+  Error.stackTraceLimit = Infinity;
   var add = require('../integer_addition.js')
   var subtract = require('../integer_subtraction.js')
-  var rand_int = require('./rand_int.js')
-  var test = require('tape')
-  var claire = require('claire')
-  var for_all = claire.forAll
-  var check = claire.check
-  var as_generator = claire.asGenerator
   var equal = require('../integer_equality.js')
+  var rand_int = require('./helpers/rand_int.js')
+  var claire = require('claire')
+  var as_generator = claire.asGenerator
   var liberate = require('liberate')
   var slice = liberate(Array.prototype.slice)
   var every = liberate(Array.prototype.every)
   var join = liberate(Array.prototype.join)
-  var bitarr = require('bit-array')
-  var pool = require('../pool.js')
-  var counter = 0
   var log = console.log.bind(console)
   var rand = require('random-number')
+  var analyzer = require('./claire-helpers/analyzer.js')
+  var klara = require('./claire-helpers/klara.js')
 
   function print(n, arr){
     return n+' '+join(arr, ', ')
@@ -45,40 +42,33 @@ void function(){
     return equal(add(a, b), add(b, a))
   }
 
-  function check_property(property){
-    test(property.title, function(t){
-      var results = check(1000, property.checks)
-      results.failed.forEach(function(result){
-        t.fail('==> '+ results.passed.length+' passed, '+', 1 failed with arguments: ' + JSON.stringify(result.arguments))
-      })
-      if ( results.failed.length == 0 ) {
-        t.pass(results.passed.length+' passed, '+results.ignored.length+' ignored')
-      }
-      t.end()
-    })
-  }
+  var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
 
-  ;[{ title : 'subtract_sum'
+  var size_1_int = as_generator(rand_int.static_generator([1,9], 'complex', 'positive'))
+  var size_2_int = as_generator(rand_int.static_generator([10,19], 'complex', 'positive'))
+  var size_3_int = as_generator(rand_int.static_generator([19,29], 'complex', 'positive'))
+  var size_4_int = as_generator(rand_int.static_generator([20,29], 'complex', 'positive'))
+  var size_5_int = as_generator(rand_int.static_generator([1,100], 'complex', 'positive'))
+
+  var props = [
+    { title : 'subtract_sum'
     , fn  : subtract_sum
-    , checks: for_all(as_generator(rand_int.generator_of_size(19,29,0))
-                    , as_generator(rand_int.generator_of_size(1,9,0))
-                    , as_generator(rand_int.generator_of_size(1,9,0))
-                    ).satisfy(subtract_sum)
+    , args: [size_3_int, size_1_int, size_1_int]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
   , { title : 'add_difference'
     , fn  : add_difference
-    , checks: for_all(as_generator(rand_int.generator_of_size(1,100,0))
-                    , as_generator(rand_int.generator_of_size(10,19,0))
-                    , as_generator(rand_int.generator_of_size(1,9,0))
-                    ).satisfy(add_difference)
+    , args:  [size_5_int, size_2_int, size_1_int]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
   , { title : 'subtract_difference'
     , fn  : subtract_difference
-    , checks: for_all(as_generator(rand_int.generator_of_size(20,29,0))
-                    , as_generator(rand_int.generator_of_size(10,19,0))
-                    , as_generator(rand_int.generator_of_size(1,9,0))
-                    ).satisfy(subtract_difference)
+    , args: [size_4_int, size_2_int, size_1_int]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
-  ].forEach(check_property)
+  ]
 
+
+
+  klara(1000, props)
 }()

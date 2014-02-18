@@ -1,6 +1,6 @@
 void function(){
   var pool = require('./pool.js')
-  var zero = require('./zero.js')()
+  var zero = require('./zero.js')
   var equal = require('./integer_equality.js')
 
  function add(A, B){

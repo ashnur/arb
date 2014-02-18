@@ -1,25 +1,23 @@
 void function(){
   'use strict'
-  var test = require('tape')
-  var pool = require('../pool.js')
   var equal = require('../integer_equality.js')
-  var rand_int = require('./rand_int.js')
+  var rand_int = require('./helpers/rand_int.js')
   var integer = require('../integer.js')
   var add = integer.add
   var subtract = integer.subtract
   var multiply = integer.multiply
-  var divide = integer.divide
+  //var divide = integer.divide
   var claire = require('claire')
-  var for_all = claire.forAll
-  var check = claire.check
   var as_generator = claire.asGenerator
-  var Integer = as_generator(function(size){ return rand_int() })
+  var Integer = as_generator(rand_int.static_generator([0,30], 'complex', 'positive'))
   var liberate = require('liberate')
   var join = liberate(Array.prototype.join)
   var log = console.log.bind(console)
+  var analyzer = require('./claire-helpers/analyzer.js')
+  var klara = require('./claire-helpers/klara.js')
 
-  var zero = require('../zero.js')()
-  var one = require('../one.js')()
+  var zero = require('../zero.js')
+  var one = require('../one.js')
 
   function print(n, arr){ return log(n, arr+'') }
 
@@ -107,67 +105,75 @@ void function(){
     return r
   }
 
+  var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
+
+  //  , checks: for_all( claire.data.Array(Integer) )
+  //     .given(function(xs){
+  //       return xs.length > 10
+  //     })
+  //     .satisfy(function(xs){
+  //       var r  = xs.reduce(function(filtered, next){
+  //          if ( filtered.every(function(i){
+  //            return ! equal ( next, i )
+  //          }) )  {
+  //            filtered.push(next)
+  //          }
+  //         return filtered
+  //       }, []).length
+  //       if ( r <= 1 ) log( xs)
+  //       return  r > 1
+  //     })
 
 
-  function check_property(property){
-    test(property.title, function(t){
-      var results = check(1000, property.checks)
-      results.failed.forEach(function(result){
-        console.log(results+'')
-        t.fail()
-      })
-      if ( results.failed.length == 0 ) {
-        t.pass(results.passed.length+' passed, '+results.ignored.length+' ignored')
-      }
-      t.end()
-    })
-  }
-
-  ;[
+  var props = [
     // this should really be prepended somehow for all tests
-    { title: 'not all the same'
-      , checks: for_all( claire.data.Array(Integer) )
-         .given(function(xs){
-           return xs.length > 10
-         })
-         .satisfy(function(xs){
-           var r  = xs.reduce(function(filtered, next){
-              if ( filtered.every(function(i){
-                return ! equal ( next, i )
-              }) )  {
-                filtered.push(next)
-              }
-             return filtered
-           }, []).length
-           if ( r <= 1 ) log( xs)
-           return  r > 1
-         })
-    }
+    // { title: 'not all the same'
+    // , fn: variety
+    // , args: [claire.data.Array(Integer)
+    // }
   , { title : 'identity'
-    , checks: for_all(Integer).satisfy(identity)
+    , fn: identity
+    , args: [Integer]
+    , analyze: analyzer(bigint_analyzer)
     }
   ,
     { title : 'additive commutativity'
-    , checks: for_all(Integer, Integer).satisfy(commutativity_add)
+    , fn: commutativity_add
+    , args: [Integer, Integer]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer)
     }
   ,
     { title : 'additive associativity'
-    , checks: for_all(Integer, Integer, Integer).satisfy(associativity_add)
+    , fn: associativity_add
+    , args: [Integer, Integer, Integer]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
   , { title : 'subtract_sum'
-    , checks: for_all(Integer, Integer, Integer).satisfy(subtract_sum)
+    , fn: subtract_sum
+    , args: [Integer, Integer, Integer]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
   , { title : 'add_difference'
-    , checks: for_all(Integer, Integer, Integer).satisfy(add_difference)
+    , fn: add_difference
+    , args: [Integer, Integer, Integer]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
   , { title : 'subtract_difference'
-    , checks: for_all(Integer, Integer, Integer).satisfy(subtract_difference)
+    , fn: subtract_difference
+    , args: [Integer, Integer, Integer]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
   , { title : 'multiplicative commutativity'
-    , checks: for_all(Integer, Integer).satisfy(commutativity_mul)
+    , fn: commutativity_mul
+    , args: [Integer, Integer]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer)
     }
   , { title : 'multiplicative associativity'
-    , checks: for_all(Integer, Integer, Integer).satisfy(associativity_mul)
+    , fn: associativity_mul
+    , args: [Integer, Integer, Integer]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
     }
-  ].forEach(check_property)
+  ]
+
+  klara(1000, props)
 }()
