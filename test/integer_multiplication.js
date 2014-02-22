@@ -3,19 +3,15 @@ void function(){
   var rand_int = require('./helpers/rand_int.js')
   var claire = require('claire')
   var as_generator = claire.asGenerator
-  //var arb_int = as_generator(rand_int.positive)
   var arb_int = as_generator(rand_int.static_generator([1,9], 'complex', 'positive'))
   var equal = require('../integer_equality.js')
   var one = require('../one.js')
   var liberate = require('liberate')
-  var join = liberate(Array.prototype.join)
   var log = console.log.bind(console)
   var klara = require('./claire-helpers/klara.js')
   var analyzer = require('./claire-helpers/analyzer.js')
+  var print = require('./helpers/print_int.js')
 
-  function print(n, arr){
-    return log(n+' '+join(arr, ', '))
-  }
 
   function associativity(a, b, c){
     var ab = multiply(a, b)

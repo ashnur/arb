@@ -25,7 +25,6 @@ void function(){
       if ( num > 0 ) num = floor(num / 65536)
       //if ( num == 0 ) break
     }
-
     return right_trim(R)
 
   }

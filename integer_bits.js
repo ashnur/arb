@@ -8,7 +8,7 @@ void function(){
   ]
 
   function trailing(a){
-    // ..seems to work for 16 bit numbers too no warrantee!
+    // ..seems to work for 16 bit numbers too, no warrantee!
     var l = 0
     for (var i = 2; i < a.length; i++) if (a[i] !== 0) break
     l = (i - 2) * 16
@@ -19,6 +19,8 @@ void function(){
 
   function leading(a) {
     var v = a[a.length - 1]
+    return v == 0 ? 16
+         : 16 - a.toString(2).length
     return v == 0 ? 16
          : v == 1 ? 15
          : 16 - Math.ceil(Math.log(v)/Math.LN2)
