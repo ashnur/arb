@@ -78,8 +78,9 @@ void function(){
   function divide(dividend, divisor){
     //log('input', dividend+'', divisor+'')
     if ( equal(zero, divisor) ) throw new Error('division by zero')
-    if ( equal(zero, dividend) ) return [zero, divisor]
+    if ( equal(zero, dividend) ) return [zero, zero]
     if ( equal(one, divisor) ) return [dividend, zero]
+    if ( compare(dividend, divisor) == -1 ) return [zero, dividend]
     var R = slowdiv(dividend, divisor)
     return [right_trim(R[0]), right_trim(R[1])]
   }
