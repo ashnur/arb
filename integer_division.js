@@ -22,7 +22,7 @@ void function(){
   function sub(A, B){
     var BR = left_shift(B, 16)
     if ( compare(A, BR) >= 0  ) {
-      var t =  slowdiv(subtract(A, BR), B)
+      var t =  sub(subtract(A, BR), B)
       return [addp(t[0], base), t[1]]
     }
 
@@ -33,11 +33,11 @@ void function(){
     if ( q > base - 1 ) q = base - 1
     var Q = to_int(q)
     var T = multiply(Q, B)
-    if ( compare(T, A) >= 0 ) {
+    if ( compare(T, A) > 0 ) {
       q = q - 1
       T = subtract(T, B)
     }
-    if ( compare(T, A) >= 0 ) {
+    if ( compare(T, A) > 0 ) {
       q = q - 1
       T = subtract(T, B)
     }

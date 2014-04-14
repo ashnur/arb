@@ -14,8 +14,8 @@ void function(){
   var claire = require('claire')
   var check = claire.check
   var as_generator = claire.asGenerator
-  var dividend = as_generator(rand_int.static_generator([2,2], 'complex', 'positive'))
-  var divisor = as_generator(rand_int.static_generator([1,1], 'complex', 'positive'))
+  var dividend = as_generator(rand_int.static_generator([2,2], 'simple', 'positive'))
+  var divisor = as_generator(rand_int.static_generator([1,1], 'simple', 'positive'))
   var klara = require('./claire-helpers/klara.js')
   var analyzer = require('./claire-helpers/analyzer.js')
   var log = console.log.bind(console)
@@ -31,7 +31,7 @@ void function(){
     var remainder = result[1]
 //    print('q', quotient)
 //    print('r', remainder)
- // log(compare(dividend, divisor))
+// log(compare(dividend, divisor))
     if ( compare(dividend, divisor) >= 0 ) {
       // normal eset, dividend a nagyobb, osztunk
       var r = add(multiply(quotient, divisor), remainder)
@@ -69,34 +69,39 @@ void function(){
     return I
   }
 
-  function to_poly(arr){
+  function to_poly(name, arr){
     var r = []
     for ( var i = 2; i < arr.length; i++ ) {
       r.push(arr[i] + ' * 65536^' +(i-2))
     }
-    log('a', r.join(' + '))
+    log(name, r.join(' + '))
   }
+  // var to_int = require('../primitive_to_int.js')
 
-//  var to_int = require('../primitive_to_int.js')
-//  var a = arr_to_int([51736,18791,9178,18928,57606,50427])
-//  var b = arr_to_int([65034,991,  2196,44177,13404])
-//  var a = arr_to_int([57130,23618])
-//  var b = arr_to_int([8])
-//  print('a', a)
-//  print('b', b)
-//  var d = divide(a, b)
-//  print('q', d[0])
-//  print('r', d[1])
-//  var c = add(multiply(d[0], b), d[1])
-//  print('c', c)
-//  if ( ! equal(c, a) ) log('failed')
-//  to_poly(a)
-//  to_poly(b)
-//  to_poly(d[0])
-//  to_poly(d[1])
+  [
+    [[5,9],[3]]
+//    [[20888,49150,23789], [40958,1573]]
+//  , [[57130,23618],[8]]
+//  , [[51736,18791,9178,18928,57606,50427], [65034,991,  2196,44177,13404]]
+  ].forEach(function(inputs){
+    var a = arr_to_int(inputs[0])
+    var b = arr_to_int(inputs[1])
+    print('a', a)
+    print('b', b)
+    var d = divide(a, b)
+    print('q', d[0])
+    print('r', d[1])
+    var c = add(multiply(d[0], b), d[1])
+    print('c', c)
+    if ( ! equal(c, a) ) log('failed')
+    to_poly('a', a)
+    to_poly('b', b)
+    to_poly('q', d[0])
+    to_poly('r', d[1])
+  })
 
 
 
-klara(50000, props)
+//klara(1000, props)
 
 }()
