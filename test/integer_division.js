@@ -14,8 +14,8 @@ void function(){
   var claire = require('claire')
   var check = claire.check
   var as_generator = claire.asGenerator
-  var dividend = as_generator(rand_int.static_generator([2,2], 'simple', 'positive'))
-  var divisor = as_generator(rand_int.static_generator([1,1], 'simple', 'positive'))
+  var dividend = as_generator(rand_int.static_generator([0,100], 'complex', 'positive'))
+  var divisor = as_generator(rand_int.static_generator([1,100], 'complex', 'positive'))
   var klara = require('./claire-helpers/klara.js')
   var analyzer = require('./claire-helpers/analyzer.js')
   var log = console.log.bind(console)
@@ -78,30 +78,33 @@ void function(){
   }
   // var to_int = require('../primitive_to_int.js')
 
-  [
-    [[5,9],[3]]
-//    [[20888,49150,23789], [40958,1573]]
+//  [
+//    [[9,5],[5]]
+//  , [[5],[2]]
+//  , [[1,9],[3]]
+//  , [[5,9],[3]]
 //  , [[57130,23618],[8]]
+//  , [[20888,49150,23789], [40958,1573]]
 //  , [[51736,18791,9178,18928,57606,50427], [65034,991,  2196,44177,13404]]
-  ].forEach(function(inputs){
-    var a = arr_to_int(inputs[0])
-    var b = arr_to_int(inputs[1])
-    print('a', a)
-    print('b', b)
-    var d = divide(a, b)
-    print('q', d[0])
-    print('r', d[1])
-    var c = add(multiply(d[0], b), d[1])
-    print('c', c)
-    if ( ! equal(c, a) ) log('failed')
-    to_poly('a', a)
-    to_poly('b', b)
-    to_poly('q', d[0])
-    to_poly('r', d[1])
-  })
+//  ].forEach(function(inputs){
+//    var a = arr_to_int(inputs[0])
+//    var b = arr_to_int(inputs[1])
+//    print('a', a)
+//    print('b', b)
+//    var d = divide(a, b)
+//    print('q', d[0])
+//    print('r', d[1])
+//    var c = add(multiply(d[0], b), d[1])
+//    print('c', c)
+//    if ( ! equal(c, a) ) log('failed')
+//    to_poly('a', a)
+//    to_poly('b', b)
+//    to_poly('q', d[0])
+//    to_poly('r', d[1])
+//  })
 
 
 
-//klara(1000, props)
+klara(1000, props)
 
 }()

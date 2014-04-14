@@ -6,7 +6,11 @@ void function(){
     var size = integer[1] - words
     var shifted = pool('integer', size)
     for ( var i = 2; i < shifted.length; i++ ) {
-      shifted[i] = ((( integer[i + 1 + words] | 0) * 65536) + integer[i + words]) >>> bits
+      var idx1 = i + 1 + words
+      var idx0 = i + words
+      var up = idx1 >= 2 ? integer[idx1] | 0 : 0
+      var down = idx0 >= 2 ? integer[idx0] : 0
+      shifted[i] = (up * 65536 + down ) >>> bits
     }
     return shifted
   }

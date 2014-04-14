@@ -1,5 +1,6 @@
 void function(){
   // http://bioinfo.ict.ac.cn/~dbu/AlgorithmCourses/Lectures/Hasselstrom2003.pdf
+  // http://www.treskal.com/kalle/exjobb/original-report.pdf
   var pool = require('./pool.js')
   var one = require('./one.js')
   var zero = require('./zero.js')
@@ -16,13 +17,14 @@ void function(){
   var log = console.log.bind(console)
   var floor = Math.floor
   var base = 65536
+  var half_base = base / 2
 
   var print = require('./test/helpers/print_int.js')
 
   function sub(A, B){
     var BR = left_shift(B, 16)
     if ( compare(A, BR) >= 0  ) {
-      var t =  sub(subtract(A, BR), B)
+      var t = slowdiv(subtract(A, BR), B)
       return [addp(t[0], base), t[1]]
     }
 
@@ -45,33 +47,45 @@ void function(){
   }
 
   function slowdiv(A, B){
-    var n = B.length - 1
-    var m = A.length - 1
-
-    if ( m < n ) return [zero, A]
-
-    if ( m == n ) {
-      var c = compare(A, B)
-      if ( c < 0 ) return [zero, A]
-      if ( c == 0 ) return [one, zero]
-      return [one, subtract(A, B)]
-    }
-
-    if ( m == n + 1 ) {
-      return sub(A, B)
-    }
-
     var shifted = 0
-    if ( B[n] < 32768 ) {
-      shifted = 16 - B[n].toString(2).length
+// log(B[B.length - 1], B[B.length - 1] < half_base)
+    if ( B[B.length - 1] < 32768 ) {
+      shifted = 16 - B[B.length - 1].toString(2).length
       A = left_shift(A, shifted)
       B = left_shift(B, shifted)
     }
+    function r(R){
+      return right_shift(R, shifted)
+    }
+// log(A+'', B+'')
+    var al = A.length
+    var bl = B.length
+    var m = al - 1
+    var n = bl - 1
 
-    var powerdiff = (m - n - 1) * 16
+    if ( m < n ) return [zero, r(A)]
+
+    if ( m == n ) {
+      var c = compare(A, B)
+      if ( c < 0 ) return [zero, r(A)]
+      if ( c == 0 ) return [one, zero]
+      return [one, r(subtract(A, B))]
+    }
+
+    if ( m == n + 1 ) {
+      var qr =  sub(A, B)
+      return [qr[0], r(qr[1])]
+    }
+
+
+    var powerdiff = (A.length - B.length - 1) * 16
+//    var powerdiff = m - n - 1
+//log(powerdiff)
     var A_p = right_shift(A, powerdiff)
+//log(A_p+'')
     var t3 = sub(A_p, B)
     var t4 = slowdiv(add(left_shift(t3[1], powerdiff), subtract(A, left_shift(A_p, powerdiff))), B)
+//    return [add(left_shift(t3[0], powerdiff), t4[0]), t4[1]]
     return [add(left_shift(t3[0], powerdiff), t4[0]), right_shift(t4[1], shifted)]
   }
 
@@ -81,6 +95,7 @@ void function(){
     if ( equal(zero, dividend) ) return [zero, zero]
     if ( equal(one, divisor) ) return [dividend, zero]
     if ( compare(dividend, divisor) == -1 ) return [zero, dividend]
+debugger
     var R = slowdiv(dividend, divisor)
     return [right_trim(R[0]), right_trim(R[1])]
   }
