@@ -14,8 +14,8 @@ void function(){
   var claire = require('claire')
   var check = claire.check
   var as_generator = claire.asGenerator
-  var dividend = as_generator(rand_int.static_generator([0,100], 'complex', 'positive'))
-  var divisor = as_generator(rand_int.static_generator([1,100], 'complex', 'positive'))
+  var dividend = as_generator(rand_int.static_generator([0,200], 'complex', 'positive'))
+  var divisor = as_generator(rand_int.static_generator([1,200], 'complex', 'positive'))
   var klara = require('./claire-helpers/klara.js')
   var analyzer = require('./claire-helpers/analyzer.js')
   var log = console.log.bind(console)
