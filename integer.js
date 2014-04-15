@@ -5,12 +5,14 @@ void function(){
   var add = require('./integer_addition.js')
   var subtract = require('./integer_subtraction.js')
   var multiply = require('./integer_multiplication.js')
-  //var divide = require('./integer_division.js')
+  var divide = require('./integer_division.js')
   var one = require('./one.js')
   var zero = require('./zero.js')
   var compare = require('./integer_compare_abs.js')
   var equal = require('./integer_equality.js')
   var sign = require('./sign.js')
+  var parse_base10 = require('./parse_base10.js')
+  var to_base10 = require('./to_base10.js')
 
 
   function addition(a, b){
@@ -46,7 +48,7 @@ void function(){
     if ( equal(b, one) ) return a
     if ( equal(a, zero) || equal(b, zero) ) return zero
     var r = multiply(a, b)
-    sign.change(r, sign.read(a)*sign.read(b))
+    sign.change(r, sign.read(a) ^ sign.read(b))
     return r
   }
 
@@ -54,9 +56,25 @@ void function(){
     if ( equal(a, one) ) return b
     if ( equal(b, one) ) return a
     if ( equal(a, zero) ) return zero
+    if ( equal(b, zero) ) throw new Error('can\'t divide with zero')
+    var r = divide(a, b)
+    sign.change(r, sign.read(a) ^ sign.read(b))
+    return r
   }
 
-  function parse(){
+  function parse(str){
+    str = str.trim()
+    if ( ! /^[\+-]?[0-9]+$/.test(str) ) throw new Error('not a valid base10')
+    if ( str[0] == '+' ) {
+      var s = 0
+      str = str.slice(1)
+    } else if ( str[0] == '-' ) {
+      var s ign = 1
+      str = str.slice(1)
+    }
+    var r = parse_base10(str)
+    sign.change(r, s)
+    return r
   }
 
   function gcd(a, b){
@@ -71,6 +89,9 @@ void function(){
   module.exports.add = addition
   module.exports.subtract = subtraction
   module.exports.multiply = multiplication
-  //module.exports.divide = division
+  module.exports.divide = division
+  module.exports.mod = mod
+
+  module.exports.parse = parse
 
 }()

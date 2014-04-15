@@ -12,7 +12,11 @@ void function(){
     test(property.title, function(t){
       var checks = for_all.apply(null, property.args)
                         .satisfy(property.fn)
-                        .classify(property.analyze)
+
+      if ( property.analyze ) {
+        checks = checks.classify(property.analyze)
+      }
+
       var results = check(count, checks)
       results.failed.forEach(function(result){
         t.fail('')
