@@ -1,18 +1,32 @@
 void function(){
   'use strict'
-  var BitArray = require('bit-array')
+  var clone = require('./clone.js')
+  function bit_test(num, bit){
+    return ((num>>bit) % 2 != 0)
+  }
+
+  function bit_set(num, bit){
+    return num | 1 << bit
+  }
+
+  function bit_clear(num, bit){
+    return num & ~(1<<bit)
+  }
+
+  function bit_toggle(num, bit){
+    return bit_test(num, bit) ? bit_clear(num, bit) : bit_set(num,bit)
+  }
+
   module.exports = {
     read: function(number){
-      var data = new BitArray(16, number[0].toString(16))
-      return data.get(0)
+      return bit_test(number[0], 0)
     }
   , change: function(number, value){
-      var data = new BitArray(16, number[0].toString(16))
-      data.set(0, value)
-      number[0] = parseInt(data.toHexString(), 16)
-//      var test = new BitArray(16, parseInt(number[0], 16)+'')
-//      console.log('sign', (test.get(0) ==  !!value), data.toString(), test.toString())
-      return number
+
+      var r = clone(number)
+      r[0] = value ? bit_set(r[0], 0) : bit_clear(r[0], 0)
+
+      return r
     }
   }
 

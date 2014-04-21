@@ -1,6 +1,8 @@
 void function(){
   var pool = require('./pool.js')
+  var type = require('./type.js')
   var compare = require('./integer_compare_abs.js')
+  var ZERO = require('./zero.js')
 
   function is_pow2(n){
     return n && !(n & (n - 1))
@@ -8,7 +10,6 @@ void function(){
   module.exports = function(A, B){
     var comp = compare(A, B)
     if ( comp == 0 ) {
-      var ZERO = pool('integer',0)
       return ZERO
     } else if ( comp > 0 ) {
       var T = B
@@ -19,7 +20,7 @@ void function(){
     var B_size = B[1]
     var R_size = B_size
 
-    var R = pool('integer', R_size)
+    var R = pool(type('integer'), R_size)
     var carry = 0
     var r = 0
 
@@ -42,7 +43,7 @@ void function(){
       i -= 1
     }
     if ( zc > 0 ) {
-      var R_shrink = pool('integer', R_length - zc - 2)
+      var R_shrink = pool(type('integer'), R_length - zc - 2)
       var ls = R_shrink.length
       R_shrink[1] = R[1] - zc
 

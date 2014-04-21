@@ -1,6 +1,6 @@
 void function(){
   var pool = require('./pool.js')
-  var zero = require('./zero.js')
+  var type = require('./type.js')
   function right_trim(arr){
     if ( arr.length == 2 ) {
       return arr
@@ -13,11 +13,9 @@ void function(){
       i -= 1
     }
     if ( zc > 0 ) {
-
-      var arr_shrink = pool('integer', arr_length - zc - 2)
+      var arr_shrink = pool(type('integer'), arr_length - zc - 2)
       var ls = arr_shrink.length
       arr_shrink[1] = arr[1] - zc
-
       for ( i = 2; i < ls; i++ ) {
         arr_shrink[i] = arr[i]
       }

@@ -1,10 +1,11 @@
 void function(){
   var pool = require('./pool.js')
+  var type = require('./type.js')
   module.exports = function right_shift(integer, n){
     var words = Math.floor(n / 16)
     var bits = n % 16
     var size = integer[1] - words
-    var shifted = pool('integer', size)
+    var shifted = pool(type('integer'), size)
     for ( var i = 2; i < shifted.length; i++ ) {
       var idx1 = i + 1 + words
       var idx0 = i + words

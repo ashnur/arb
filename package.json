@@ -31,7 +31,7 @@
     "liberate": "*"
   },
   "dependencies": {
-    "bit-array": "*",
+    "liberate": "*",
     "random-number": "*"
   }
 }

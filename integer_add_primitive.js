@@ -1,5 +1,6 @@
 void function(){
   var pool = require('./pool.js')
+  var type = require('./type.js')
   var zero = require('./zero.js')
   var right_trim = require('./integer_right_trim.js')
   var equal = require('./integer_equality.js')
@@ -9,13 +10,12 @@ void function(){
   var log10 = Math.log
   var floor = Math.floor
 
-
   function add_number(A, num, idx){
     idx = idx || 0
     if ( num == 0 ) return A
     if ( equal(A, zero) ) return left_pad(to_int(num), idx)
     var R_size = max(A[1], 1 + floor(log10(num) / log10(65536))) + 1 + idx
-    var R = pool('integer', R_size)
+    var R = pool(type('integer'), R_size)
     for ( var i = 2; i < idx + 2; i++ ) {
       R[i] = (A[i] | 0)
     }

@@ -1,5 +1,6 @@
 void function(){
   var pool = require('./pool.js')
+  var type = require('./type.js')
   var zero = require('./zero.js')
   var equal = require('./integer_equality.js')
 
@@ -9,7 +10,7 @@ void function(){
     var A_size = A[1]
     var B_size = B[1]
     var R_size = Math.max(A_size, B_size) + 1
-    var R = pool('integer', R_size)
+    var R = pool(type('integer'), R_size)
     var carry = 0
     var r = 0
     var R_length = R_size + 2
@@ -20,8 +21,7 @@ void function(){
     }
     if ( carry ) R[i] = R[i] + 1
     if ( R[R_length - 1] == 0 ) {
-//      R[1] = R[1] - 1 // equal should be changed for this to work
-      var R_shrink = pool('integer', R_size - 1)
+      var R_shrink = pool(type('integer'), R_size - 1)
       var ls = R_shrink.length
       R_shrink[1] = R[1] - 1
 

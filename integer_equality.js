@@ -1,7 +1,6 @@
 void function(){
   module.exports = function(a, b){
-    var l = a.length
-    for ( var i = 0; i < l; i++ ) {
+    for ( var i = 0; i < a.length; i++ ) {
       if ( a[i] !== b[i] ) return false
     }
     return true

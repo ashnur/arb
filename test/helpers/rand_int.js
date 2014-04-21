@@ -2,6 +2,7 @@ void function(){
   var rn = require('random-number')
   var rint = rn.generator({integer: true})
   var pool = require('../../pool.js')
+  var type = require('../../type.js')
   var sign = require('../../sign.js')
 
 
@@ -19,10 +20,12 @@ void function(){
   */
   function random_bigint(l, s, bigit){
     var bigit_count = rint(l[0], l[1])
-    var arr = pool('integer', bigit_count)
+    var arr = pool(type('integer'), bigit_count)
 
     if ( bigit_count > 0 ) {
-      sign.change(arr, s == null ? rint(0, 1) : s)
+      var tarr = sign.change(arr, s == null ? rint(0, 1) : s)
+      pool.free(arr)
+      arr = tarr
     }
 
     for ( var i = 2; i < bigit_count + 2; i ++ ) {

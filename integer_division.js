@@ -1,7 +1,7 @@
 void function(){
+  "use strict"
   // http://bioinfo.ict.ac.cn/~dbu/AlgorithmCourses/Lectures/Hasselstrom2003.pdf
   // http://www.treskal.com/kalle/exjobb/original-report.pdf
-  var pool = require('./pool.js')
   var one = require('./one.js')
   var zero = require('./zero.js')
   var compare = require('./integer_compare_abs.js')
@@ -29,8 +29,8 @@ void function(){
     }
 
     var n = A.length - 1
-    A_p = n > 2 ? A[n - 1] : 0
-    B_p = n > 2 ? B[n - 1] : 0
+    var A_p = n > 2 ? A[n - 1] : 0
+    var B_p = n > 2 ? B[n - 1] : 0
     var q = floor((base * A[n] + A_p) / B_p)
     if ( q > base - 1 ) q = base - 1
     var Q = to_int(q)
@@ -80,11 +80,6 @@ void function(){
   }
 
   function divide(dividend, divisor){
-    //log('input', dividend+'', divisor+'')
-    if ( equal(zero, divisor) ) throw new Error('division by zero')
-    if ( equal(zero, dividend) ) return [zero, zero]
-    if ( equal(one, divisor) ) return [dividend, zero]
-    if ( compare(dividend, divisor) == -1 ) return [zero, dividend]
     var R = slowdiv(dividend, divisor)
     return [right_trim(R[0]), right_trim(R[1])]
   }

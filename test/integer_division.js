@@ -62,7 +62,8 @@ void function(){
 
   function arr_to_int(arr){
     var pool = require('../pool.js')
-    var I = pool('integer', arr.length)
+    var type = require('../type.js')
+    var I = pool(type('integer'), arr.length)
     for ( var i = 0; i < arr.length; i++ ) {
       I[i + 2] = arr[i]
     }
