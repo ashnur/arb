@@ -94,6 +94,7 @@ void function(){
   }
 
   function to_dec(integer){
+    if ( equal(zero, integer) ) return '0'
     var string = to_base10(integer)
     if ( sign.read(integer) ) string = '-' + string
     return string
