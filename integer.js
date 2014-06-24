@@ -153,6 +153,8 @@ void function(){
 
   arb.equal = equal
 
+  arb.pool = pool
+
 
   module.exports = arb
 
