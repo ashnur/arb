@@ -1,6 +1,6 @@
 {
   "name": "arb",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "arbitrary precision number types and operations on them",
   "main": "index.js",
   "directories": {
