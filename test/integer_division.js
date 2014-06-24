@@ -106,6 +106,6 @@ void function(){
 
 
 
-klara(1000, props)
+klara(10, props)
 
 }()
