@@ -23,7 +23,7 @@
     "polynumbers"
   ],
   "author": "ashnur",
-  "license": "ISC",
+  "license": "BSD-2-Clause",
   "devDependencies": {
     "tape": "*",
     "claire": "*",
