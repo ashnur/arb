@@ -13,15 +13,19 @@ function to_poly(name, arr){
 }
 
 function print(n, pointer){
+  console.log('print', pointer)
   var v = []
   var i = []
   var a = 0
+  var guard = 1000
   while (  pointer != 0  ) {
+    console.log(pointer)
     //if ( a > 1 ) v.push(heap[pointer]  + ' * 65536^' + ( a - 2 ) )
     v.push(heap[pointer])
     i.push(pointer + ':' + ads[pointer])
     pointer = ads[pointer]
     a++
+    if ( ! (--guard) ) throw new Error('STOP')
   }
   if ( ! v.length ) v.push(0)
   return console.log('print: ' + n,v.join(' , '), i)

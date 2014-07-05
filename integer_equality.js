@@ -4,7 +4,7 @@ var print = require('./print.js')
 var data = memory.data
 var ads = memory.ads
 var max = Math.max
-function equal(a, b){
+function equal(a, b, debug){
   if ( a === b ) return true
   if ( data[a] !== data[b] ) return false
   var aidx = ads[a]
