@@ -14,9 +14,6 @@ function is_pow2(n){
 }
 
 function subtract(A, B){
-//print('A', A)
-//print('B', B)
-//console.log('comp', compare(A, B))
   var comp = compare(A, B)
   if ( comp == 0 ) {
     return ZERO

@@ -1,5 +1,6 @@
 var memory = require('./memory.js')
-var heap = memory.data
+var data = memory.data
+var ads = memory.ads
 var add = require('./integer_addition.js')
 var subtract = require('./integer_subtraction.js')
 var multiply = require('./integer_multiplication.js')
@@ -11,6 +12,8 @@ var equal = require('./integer_equality.js')
 var sign = require('./sign.js')
 var parse_base10 = require('./parse_base10.js')
 var to_base10 = require('./to_base10.js')
+var clone = require('./clone.js')
+var print = require('./print.js')
 
 function compare(a, b){
   var na = sign.read(a) ? -1 : 1
@@ -35,7 +38,7 @@ function addition(a, b){
     var r = subtract(a, b)
   }
 
-  if ( r[1] ) {
+  if ( data[ads[r]] ) {
     sign.change(r, sign.read(a))
   }
   return r
@@ -44,8 +47,8 @@ function addition(a, b){
 function subtraction(a, b){
   if ( equal(b, zero) ) return a
   if ( equal(a, b) ) return zero
-  var subtrahend = b
-  if ( b[1] ) {
+  var subtrahend = clone(b)
+  if ( data[ads[b]] ) {
     sign.change(subtrahend, sign.read(b) ? false : true)
   }
   if ( equal(a, zero) ) { return subtrahend }
@@ -67,8 +70,8 @@ function division(a, b){
   if ( compare_abs(a, b) == -1 ) return [zero, a]
   if ( equal(b, zero) ) throw new Error('can\'t divide with zero')
   var r = divide(a, b)
-  sign.change(r[0], sign.read(a) ^ sign.read(b))
-  sign.change(r[1], sign.read(a) ^ sign.read(b))
+  if ( r[0] != one ) sign.change(r[0], sign.read(a) ^ sign.read(b))
+  if ( r[1] != one ) sign.change(r[1], sign.read(a) ^ sign.read(b))
   return r
 }
 
@@ -99,13 +102,13 @@ function to_dec(integer){
 function abs(integer){
   var v = integer
   if ( sign.read(integer) ) {
-    sign.change(v, 0)
+    sign.change(clone(v), 0)
   }
   return v
 }
 
 function negate(integer){
-  sign.change(integer, sign.read(integer) ? false : true)
+  sign.change(clone(integer), sign.read(integer) ? false : true)
   return integer
 }
 
@@ -124,7 +127,6 @@ function gcd(a, b){
 function lcm(a, b){
   return division(abs(multiplication(a, b)), gcd(a,b))
 }
-
 
 var arb = {}
 
