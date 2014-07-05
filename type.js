@@ -1,14 +1,9 @@
-void function(){
-  'use strict'
-  var types = {
-    integer: 0 // 0
-  , rational: 2 // 10
-  , polyinteger: 14 //1110
-  , polyrational: 30 //11110
-  }
+module.exports = type2bits
 
-  module.exports = function(type){
-    return types[type] || types['integer']
-  }
-
-}()
+function type2bits(type){
+  if ( type == 'integer' ) return 0 // 0
+  if ( type == 'rational' ) return 2 // 10
+  if ( type == 'polyinteger' ) return 14 //1110
+  if ( type == 'polyrational' ) return 30 //11110
+  return 0
+}

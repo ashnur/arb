@@ -1,39 +1,70 @@
-void function(){
-  var pool = require('./pool.js')
-  var type = require('./type.js')
-  var zero = require('./zero.js')
-  var equal = require('./integer_equality.js')
+module.exports = add
+var memory = require('./memory.js')
+var data = memory.data
+var ads = memory.ads
+var alloc = memory.alloc
+var free = memory.free
+var zero = require('./zero.js')
+var equal = require('./integer_equality.js')
+var max = Math.max
+var min = Math.min
+var print = require('./print.js')
+var right_trim = require('./integer_right_trim.js')
+var get_new_zero = require('./get_new_zero.js')
 
- function add(A, B){
-    if ( equal(A, zero) ) return B
-    if ( equal(B, zero) ) return A
-    var A_size = A[1]
-    var B_size = B[1]
-    var R_size = Math.max(A_size, B_size) + 1
-    var R = pool(type('integer'), R_size)
-    var carry = 0
-    var r = 0
-    var R_length = R_size + 2
-    for ( var i = 2; i < R_length; i++ ) {
-      r = (A[i] | 0) + (B[i] | 0) + carry
-      R[i] = r
-      carry =  r > 65535 ? 1 : 0
-    }
-    if ( carry ) R[i] = R[i] + 1
-    if ( R[R_length - 1] == 0 ) {
-      var R_shrink = pool(type('integer'), R_size - 1)
-      var ls = R_shrink.length
-      R_shrink[1] = R[1] - 1
+function add(A, B){
+  if ( equal(A, zero) ) return B
+  if ( equal(B, zero) ) return A
+  var aidx = ads[A]
+  var bidx = ads[B]
+  var A_size = data[aidx]
+  var B_size = data[bidx]
+  if ( A_size < B_size ) {
+    var t = A
+    A = B
+    B = t
 
-      for ( i = 2; i < ls; i++ ) {
-        R_shrink[i] = R[i]
-      }
-      pool.free(R)
-      return R_shrink
+    t = A_size
+    A_size = B_size
+    B_size = t
 
-    }
-    return R
+    t = aidx
+    aidx = bidx
+    bidx = t
+  }
+  var R_size = A_size + 1
+  var R = alloc(R_size + 2)
+  data[R] = 0 // type integer
+
+  var ridx = ads[R]
+  data[ridx] = R_size
+
+  var carry = 0
+  var partial = 0
+  var i = 0
+  var limit = B_size
+  while ( i < limit ) {
+    aidx = ads[aidx]
+    bidx = ads[bidx]
+    ridx = ads[ridx]
+    partial = data[aidx] + data[bidx] + carry
+    data[ridx] = partial
+    carry = partial > 65535 ? 1 : 0
+    i ++
+  }
+  limit = A_size
+  while ( i < limit ) {
+    aidx = ads[aidx]
+    ridx = ads[ridx]
+    partial = data[aidx] + carry
+    data[ridx] = partial
+    carry = partial > 65535 ? 1 : 0
+    i ++
   }
 
-  module.exports = add
-}()
+  ridx = ads[ridx]
+  data[ridx] += carry
+
+  var rr = right_trim(R)
+  return rr
+}

@@ -7,8 +7,9 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node test/*.js"
+    "test": "node test/integer.js"
   },
+  "repository": "git@github.com:ashnur/arb.git",
   "keywords": [
     "bignumbers",
     "bigintegers",
@@ -25,10 +26,10 @@
   "author": "ashnur",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "tape": "*",
-    "claire": "*",
     "biginteger": "*",
-    "liberate": "*"
+    "claire": "*",
+    "liberate": "^1.0.1",
+    "tape": "*"
   },
   "dependencies": {
     "liberate": "*",

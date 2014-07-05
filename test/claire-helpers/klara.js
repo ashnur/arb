@@ -25,6 +25,7 @@ void function(){
         t.pass('all test passed')
       }
       console.log(results+'')
+      property.end()
       t.end()
     })
   }

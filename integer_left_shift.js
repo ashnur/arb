@@ -1,21 +1,44 @@
-void function(){
-  var pool = require('./pool.js')
-  var type = require('./type.js')
-  var leading = require('./integer_bits.js').leading
-  module.exports = function left_shift(integer, n){
-    var words = Math.floor(n / 16)
-    var bits = n % 16
+module.exports = left_shift
+var memory = require('./memory.js')
+var right_trim = require('./integer_right_trim.js')
+var data = memory.data
+var ads = memory.ads
+var alloc = memory.alloc
+var type = require('./type.js')
+var left_pad = require('./left_pad.js')
+var print = require('./print.js')
+var one = require('./one.js')
+var zero = require('./zero.js')
+var equal = require('./integer_equality.js')
+var clone = require('./clone.js')
+function left_shift(integer, n){
+  if ( equal(integer, zero) ) return zero
+  var words = Math.floor(n / 16)
+  var bits = n % 16
+  var bats = 16 - bits
+  var sidx = ads[integer]
 
-    var il = integer.length - 1
-    var all_bits = integer[1] == 0 ? 0
-                 :                   integer[il].toString(2).length + (16 * (il - 2))
+  // var size = Math.ceil((n + all_bits) / 16)
+  var size = data[sidx] + 1
+  if ( bits ) {
+    var shifted = alloc(size + 2)
+    data[shifted] = 0 // type integer
+    var ridx = ads[shifted]
+    data[ridx] = size
 
-    var size = Math.ceil((n + all_bits) / 16)
-    var shifted = pool(type('integer'), size)
-    for ( var i = shifted.length - 1; i > 1; i-- ) {
-      var idx = i - words
-      shifted[i] = (idx - 1 > 1 ? (integer[idx - 1] >>> (16 - bits)) : 0 ) + ( (idx > 1 ? integer[idx] : 0) <<  bits )
-    }
-    return shifted
+    var carry = 0
+    do {
+      sidx = ads[sidx]
+      ridx = ads[ridx]
+      data[ridx] = carry + (data[sidx] << bits)
+      carry = data[sidx] >>> bats
+    } while ( sidx != 0 )
+
+  } else {
+    var shifted = clone(integer)
   }
-}()
+
+  var wrd = right_trim(left_pad(shifted, words))
+  return words ? wrd : right_trim(shifted)
+
+}

@@ -1,14 +1,28 @@
-void function(){
-  var pool = require('./pool.js')
-  var type = require('./type.js')
+module.exports = left_pad
+var memory = require('./memory.js')
+var malloc = memory.alloc
+var heap = memory.data
+var ads = memory.ads
+var print = require('./print.js')
 
-  module.exports = function left_pad(A, by){
-    var R = pool(type('integer'), A[1] + by)
-    var i = 2 + by, l = R.length
-    for ( ; i < l; i++ ) {
-      R[i] = A[i - by]
+function left_pad(A, by){
+  var aidx = ads[A]
+  var size = heap[aidx] + by
+
+  var R = malloc(size + 2)
+  heap[R] = 0 //type integer
+
+  var ridx = ads[R]
+  heap[ridx] = size
+
+  var i = - by
+  while ( ads[ridx] != 0 ) {
+    i++
+    ridx = ads[ridx]
+    if ( i > 0 ) {
+      aidx = ads[aidx]
+      heap[ridx] = heap[aidx]
     }
-    return R
   }
-
-}()
+  return R
+}

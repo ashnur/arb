@@ -6,7 +6,8 @@ void function(){
   var add = integer.add
   var subtract = integer.subtract
   var multiply = integer.multiply
-  //var divide = integer.divide
+  var divide = integer.divide
+  var compare = integer.compare
   var claire = require('claire')
   var as_generator = claire.asGenerator
   var Integer = as_generator(rand_int.static_generator([0,30], 'complex', 'positive'))
@@ -105,6 +106,27 @@ void function(){
     return r
   }
 
+  function back_substitution_div(dividend, divisor){
+    if ( ! equal(divisor, zero) ) {
+      var result = divide(dividend, divisor)
+      var quotient = result[0]
+      var remainder = result[1]
+      if ( compare(dividend, divisor) >= 0 ) {
+        var r = add(multiply(quotient, divisor), remainder)
+        return equal(dividend, r)
+      } else {
+        return equal(quotient, zero) && equal(dividend, remainder)
+      }
+    } else {
+      try {
+        divide(dividend, divisor)
+      } catch (e) {
+        return e.message == 'can\'t divide with zero'
+      }
+    }
+    return false
+  }
+
   var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
 
   //  , checks: for_all( claire.data.Array(Integer) )
@@ -172,6 +194,11 @@ void function(){
     , fn: associativity_mul
     , args: [Integer, Integer, Integer]
     , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
+    }
+  , { title : 'division back substitution'
+    , fn: back_substitution_div
+    , args: [Integer, Integer]
+    , analyze: analyzer(bigint_analyzer, bigint_analyzer)
     }
   ]
 

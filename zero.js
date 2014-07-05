@@ -1,6 +1,9 @@
-void function(){
-  var pool = require('./pool.js')
-  var type = require('./type.js')
-  var zero = pool(type('integer'), 0)
-  module.exports = zero
-}()
+var memory = require('./memory.js')
+var alloc = memory.cnst
+var data = memory.data
+var ads = memory.ads
+var zero = alloc(2)
+data[zero] = 0 // type integer
+var idx = ads[zero]
+data[idx] = 0 // size zero
+module.exports = zero
