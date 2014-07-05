@@ -1,8 +1,9 @@
 module.exports = parse
 
 var memory = require('./memory.js')
-var heap = memory.data
-var malloc = memory.alloc
+var data = memory.data
+var alloc = memory.alloc
+var ads = memory.ads
 var free = memory.free
 var add = require('./integer_addition.js')
 var multiply = require('./integer_multiplication.js')
