@@ -1,4 +1,4 @@
-I think the original idea ( using Uint16Array heap for bigits, which is maintained a linked list typedarray) is viable, but currently the alloc/free part poses a serious block. It seems to me that any kind of free() at runtime hinders performance too much. 
+I think the original idea ( using Uint16Array heap for bigits, which is maintained through a linked list typedarray) is viable, but currently the alloc/free part poses a serious block. It seems to me that any kind of free() at runtime hinders performance too much. 
 
 I see two possible solutions to this.
 
