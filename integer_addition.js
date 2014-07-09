@@ -8,9 +8,7 @@ var zero = require('./zero.js')
 var equal = require('./integer_equality.js')
 var max = Math.max
 var min = Math.min
-var print = require('./print.js')
 var right_trim = require('./integer_right_trim.js')
-var get_new_zero = require('./get_new_zero.js')
 
 function add(A, B){
   if ( equal(A, zero) ) return B
@@ -36,8 +34,10 @@ function add(A, B){
   var R = alloc(R_size + 2)
   data[R] = 0 // type integer
 
-  var ridx = ads[R]
-  data[ridx] = R_size
+  var rsizeidx = ads[R]
+  data[rsizeidx] = R_size
+  var ridx = rsizeidx
+
 
   var carry = 0
   var partial = 0
@@ -63,8 +63,13 @@ function add(A, B){
   }
 
   ridx = ads[ridx]
-  data[ridx] += carry
+  if ( carry ) {
+    data[ridx] += carry
+  } else {
+    data[rsizeidx] = R_size -1
+    free(ads[ridx])
+    ads[ridx] = 0
+  }
 
-  var rr = right_trim(R)
-  return rr
+  return R
 }

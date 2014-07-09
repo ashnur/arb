@@ -7,7 +7,6 @@ var ads = memory.ads
 var type = require('../../type.js')
 var sign = require('../../sign.js')
 
-
 var rand_bool = rn.bind(null, {integer:true})
 var rand_small_nat = rn.bind(null, {min: 1, max: 5, integer:true})
 var rand_large = rn.bind(null, {min: 1, max:2, integer:true})
