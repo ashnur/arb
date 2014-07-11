@@ -7,6 +7,7 @@ var max = Math.max
 function equal(a, b, debug){
   if ( a === b ) return true
   if ( data[a] !== data[b] ) return false
+    // console.log('q')
   var aidx = ads[a]
   var bidx = ads[b]
   while ( aidx != 0 ) {

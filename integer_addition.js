@@ -9,10 +9,13 @@ var equal = require('./integer_equality.js')
 var max = Math.max
 var min = Math.min
 var right_trim = require('./integer_right_trim.js')
+var print = require('./print.js')
 
 function add(A, B){
   if ( equal(A, zero) ) return B
   if ( equal(B, zero) ) return A
+  //   print('A', A)
+  // print('B', B)
   var aidx = ads[A]
   var bidx = ads[B]
   var A_size = data[aidx]
@@ -62,11 +65,14 @@ function add(A, B){
     i ++
   }
 
-  ridx = ads[ridx]
+  //ridx = ads[ridx]
+
   if ( carry ) {
     data[ridx] += carry
   } else {
-    data[rsizeidx] = R_size -1
+    // console.log(A_size, B_size, R_size, carry, ridx, ads[ridx])
+    // print('R',R)
+    data[rsizeidx] = R_size - 1
     free(ads[ridx])
     ads[ridx] = 0
   }

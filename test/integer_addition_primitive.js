@@ -1,9 +1,3 @@
-require("better-stack-traces").install({
-  before: 2, // number of lines to show above the error
-  after: 3, // number of lines to show below the error
-  maxColumns: 80, // maximum number of columns to output in code snippets
-  collapseLibraries: /node_modules/ // omit code snippets from paths that match the given regexp (ignores node_modules by default)
-})
 var memory = require('../memory.js')
 var add = require('../integer_addition.js')
 var addp = require('../integer_add_primitive.js')
