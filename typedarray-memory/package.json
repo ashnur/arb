@@ -1,0 +1,21 @@
+{
+  "name": "typedarray-memory",
+  "version": "0.0.0",
+  "description": "very basic and simple alloc and free over typedarrays",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test/linked-list.js"
+  },
+  "keywords": [
+    "memory",
+    "typedarray",
+    "alloc",
+    "free"
+  ],
+  "author": "ashnur",
+  "license": "BSD-2-Clause",
+  "devDependencies": {
+    "liberate": "^1.0.1",
+    "tape": "^2.13.3"
+  }
+}
