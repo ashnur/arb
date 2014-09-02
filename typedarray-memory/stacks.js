@@ -14,7 +14,6 @@ function Memory(type, size, silent){
   var unallocated = size
   var brk = 1 // this is the next data index. if it's zero we ran out of space
   var next = 0 // this is the next address index. it should be never zero
-
   var heap = {
     data: data
   , ads: address
@@ -45,7 +44,8 @@ function Memory(type, size, silent){
       if ( silent ) return
       throw new Error('trying to free pointer: ' + pointer )
     }
-    address[pointer] = 0
+    brk = address[pointer]
+    next = pointer
   }
 
   function extend(needed){
