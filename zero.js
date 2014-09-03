@@ -1,9 +1,9 @@
 var memory = require('./memory.js')
-var alloc = memory.cnst
-var data = memory.data
-var ads = memory.ads
-var zero = alloc(2)
-data[zero] = 0 // type integer
-var idx = ads[zero]
-data[idx] = 0 // size zero
+
+var zero = memory.constants(2)
+var type = memory.values[zero]
+console.log(zero)
+var pointer = memory.pointers[zero]
+var didx = type.ads[pointer]
+type.data[didx + 1] = 0 // type integer
 module.exports = zero

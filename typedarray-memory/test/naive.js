@@ -62,9 +62,9 @@ test('free', function(t){
   t.ok('brave' == rbrave, 'storing and restoring')
   t.ok('world' == readString(world), 'storing and restoring')
   var antic_hay = saveString('antic hays')
-dump()
+//dump()
   var rah = readString(antic_hay)
-  console.log('rah', rah)
+//  console.log('rah', rah)
   t.ok('antic hays' == rah, 'storing and restoring')
   numbers.free(world)
   numbers.free(antic_hay)
@@ -102,9 +102,9 @@ function readString(pointer, cnst){
   var start = ads[pointer]
   var idx = start
   var size = data[idx++]
-  console.log('trying to read', pointer, size, data.length)
+  //console.log('trying to read', pointer, size, data.length)
   while ( idx <= start + size ) {
-    console.log('g', idx, fromCharCode(data[idx]))
+    //console.log('g', idx, fromCharCode(data[idx]))
     values.push(data[idx++])
   }
   return join(map(values, fromCharCode), '')
