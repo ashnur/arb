@@ -1,7 +1,9 @@
+// TODO: shouldn't probably use idx here, or at least
+// should have the option to just send/receive the type
 var memory = require('./memory.js')
-var heap = memory.data
-var malloc = memory.alloc
-var free = memory.free
+var numbers = memory.numbers
+var values = memory.values
+var pointers = memory.pointers
 
 function bit_test(num, bit){
   return ((num>>bit) % 2 != 0)
@@ -20,12 +22,15 @@ function bit_toggle(num, bit){
 }
 
 module.exports = {
-  read: function(pointer){ return bit_test(heap[pointer], 0) }
-, change: function(pointer, value){
+  read: function(idx){
+    return bit_test(values[idx][pointers[idx] + 1], 0)
+  }
+, change: function(idx, value){
+    var t = values[idx]
+    var pointer = pointers[idx]
+    var didx = t.ads[pointer] + 1 // +1 for type, as the first segment is the size
+    var data = t.data
 
-    //var r = malloc(heap[pointer], heap[pointer + 1], pointer)
-    //free(pointer)
-    heap[pointer] = value ? bit_set(heap[pointer], 0) : bit_clear(heap[pointer], 0)
-    //return r
+    data[didx] = value ? bit_set(data[didx], 0) : bit_clear(data[didx], 0)
   }
 }

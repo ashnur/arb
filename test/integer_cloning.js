@@ -1,6 +1,6 @@
 var test = require('tape')
 var rand_int = require('./helpers/rand_int.js')()
-var clone = require('../clone.js')
+var clone = require('../integer_clone.js')
 var equal = require('../integer_equality.js')
 
 test('cloning', function(t){

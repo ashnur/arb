@@ -1,7 +1,5 @@
 module.exports = print
 var memory = require('./memory.js')
-var heap = memory.data
-var ads = memory.ads
 
 function to_poly(name, arr){
   var r = []
@@ -12,22 +10,26 @@ function to_poly(name, arr){
   log(name, r.join(' + '))
 }
 
-function print(n, pointer){
-  console.log('print', pointer)
+function print(n, idx){
+  var pointer = memory.pointers[idx]
+  var t = memory.values[idx]
+  var data = t.data
+  var didx = t.ads[pointer]
+//console.log('p', pointer, didx, Math.max.apply(0, memory.values.map(function(t){ return t.ads.length})))
+// console.log('p', pointer)
+// console.log('adz', t.ads)
+// console.log('didx', didx)
+//console.log('print', idx, pointer)
   var v = []
-  var i = []
   var a = 0
   var guard = 1000
-  while (  pointer != 0  ) {
-    console.log(pointer)
+  var size = data[didx]
+//console.log('size', size)
+  for ( var j = 0; j < size; j++ ) {
     //if ( a > 1 ) v.push(heap[pointer]  + ' * 65536^' + ( a - 2 ) )
-    v.push(heap[pointer])
-    i.push(pointer + ':' + ads[pointer])
-    pointer = ads[pointer]
-    a++
+    v.push(data[didx + j])
     if ( ! (--guard) ) throw new Error('STOP')
   }
-  if ( ! v.length ) v.push(0)
-  return console.log('print: ' + n,v.join(' , '), i)
+  return console.log('' + n,v.join(' , '))
 }
 

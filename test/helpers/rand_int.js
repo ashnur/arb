@@ -1,10 +1,9 @@
 var rn = require('random-number')
 var rint = rn.generator({integer: true})
 var memory = require('../../memory.js')
-var malloc = memory.alloc
-var heap = memory.data
-var ads = memory.ads
-var type = require('../../type.js')
+var numbers = memory.numbers
+var values = memory.values
+var pointers = memory.pointers
 var sign = require('../../sign.js')
 
 var rand_bool = rn.bind(null, {integer:true})
@@ -24,20 +23,21 @@ positive, integer
 
 function random_bigint(l, s, bigit){
   var bigit_count = rint(l[0], l[1])
-  var pointer = malloc(bigit_count + 2)
+  var idx = numbers(bigit_count + 2)
+  var pointer = pointers[idx]
+  var t = values[idx]
+  var didx = t.ads[pointer]
+  var data = t.data
 
-  heap[pointer] = type('integer')
-  if ( bigit_count > 0 ) { sign.change(pointer, s == null ? rint(0, 1) : s) }
+  data[didx + 1] = 0 // type
+  if ( bigit_count > 0 ) { sign.change(idx, s == null ? rint(0, 1) : s) }
 
-  var idx = ads[pointer]
-  heap[idx] = bigit_count
-
-  for ( var i = 0; i < bigit_count ; i ++ ) {
-    idx = ads[idx]
-    heap[idx] = rint(bigit[0], bigit[1]) // set min max on the integer generator
+  var size = bigit_count + 2
+  for ( var i = 2; i < size; i ++ ) {
+    data[didx + i] = rint(bigit[0], bigit[1]) // set min max on the integer generator
   }
 
-  return pointer
+  return idx
 }
 
 function bigint_generator(size, complexity, sign){

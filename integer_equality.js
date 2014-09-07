@@ -1,18 +1,24 @@
 module.exports = equal
 var memory = require('./memory.js')
+var pointers = memory.pointers
+var values = memory.values
 var print = require('./print.js')
-var data = memory.data
-var ads = memory.ads
 var max = Math.max
-function equal(a, b, debug){
+function equal(a, b){
   if ( a === b ) return true
-  if ( data[a] !== data[b] ) return false
-  var aidx = ads[a]
-  var bidx = ads[b]
-  while ( aidx != 0 ) {
-    if ( data[aidx] != data[bidx] ) return false
-    aidx = ads[aidx]
-    bidx = ads[bidx]
+  var pointer_a = pointers[a]
+  var pointer_b = pointers[b]
+  var t_a = values[a]
+  var t_b = values[b]
+  var data_a = t_a.data
+  var data_b = t_b.data
+  var didx_a = t_a.ads[pointer_a]
+  var didx_b = t_b.ads[pointer_b]
+  var size_a = t_a.data[didx_a]
+  var size_b = t_b.data[didx_b]
+  if ( size_a !== size_b ) return false
+  for ( var i = 1; i < size_a; i++ ) {
+    if ( data_a[didx_a + i] != data_b[didx_b + i] ) return false
   }
   return true
 }

@@ -1,12 +1,14 @@
 module.exports = get_new_zero
 var memory = require('./memory.js')
-var data = memory.data
-var alloc = memory.alloc
-var ads = memory.ads
 function get_new_zero(){
-  var zero = alloc(2)
-  data[zero] = 0 // type integer
-  var idx = ads[zero]
-  data[idx] = 0 // size zero
+  var zero = memory.numbers(2)
+  var pointer = memory.pointers[zero]
+  var t = memory.values[zero]
+
+  var didx = t.ads[pointer]
+if ( t.data[didx] !== 2 ) console.log('get new zero size is not 2' , t.data[didx] )
+
+  t.data[didx + 1] = 0 // type integer
+
   return zero
 }

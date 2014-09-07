@@ -6,13 +6,14 @@ var max = Math.max
 
 function Memory(type, size, silent){
   silent = silent || true
+  if ( size < 1 ) throw new Error('minimum size is 1')
 
   var data = new type(size)
-  var address = Address(size)
+  var address = Address(size, size)
 
-  var unallocated = size
-  var brk = 1 // this is the next data index. if it's zero we ran out of space
-  var next = 0 // this is the next address index. it should be never zero
+  var unallocated = size - 1
+  var brk = 0 // this is the next data index.
+  var next = 1 // this is the next address index.
   var heap = {
     data: data
   , ads: address
@@ -31,14 +32,16 @@ function Memory(type, size, silent){
     // save data_idx in address space and advance next
     var pointer = next++
     if ( pointer == address.length ) {
-      address = resize(address, address.length * 2)
+      heap.ads = address = resize(address, address.length * 2)
     }
     address[pointer] = data_idx
     return pointer
   }
 
   function extend(needed){
+console.log('extend cosntants to '+ needed)
     heap.data = data = resize(data, max(size * 2, size - unallocated + needed) )
+console.log('end of extend:', unallocated)
   }
 
   return heap
