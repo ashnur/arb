@@ -41,7 +41,6 @@ function Memory(type, size, silent){
     log('brk before', brk)
     if ( length > unallocated ) {
       extend(length)
-      log('brk extended', brk)
     //  log('data')
     //  log(dumpta(heap.data))
     }
@@ -76,14 +75,21 @@ function dumpta(ta){
   }
 
   function extend(needed){
+    var obrk = brk
     var cl  = data.length
     var nl = max(cl * 2, cl - unallocated + needed)
-    var update = resize_naive(address, next, data, nl)
+    var update = resize_naive(address, next, data, nl, brk)
     heap.data = data = update.data
     brk = update.brk
     unallocated = data.length - brk - 1
+    log('brk extended', brk, obrk,  cl, nl)
+  }
+
+  function getsize(idx){
+    return data[idx]
   }
 
   return heap
 
 }
+

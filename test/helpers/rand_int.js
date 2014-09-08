@@ -22,15 +22,15 @@ positive, integer
 */
 
 function random_bigint(l, s, bigit){
-  var bigit_count = rint(l[0], l[1])
-  var idx = numbers(bigit_count + 2)
+  var bigit_count = rint(l[0] + 2, l[1])
+  var idx = numbers(bigit_count)
   var pointer = pointers[idx]
   var t = values[idx]
   var didx = t.ads[pointer]
   var data = t.data
 
   data[didx + 1] = 0 // type
-  if ( bigit_count > 0 ) { sign.change(idx, s == null ? rint(0, 1) : s) }
+  //if ( bigit_count > 0 ) { sign.change(idx, s == null ? rint(0, 1) : s) }
 
   var size = bigit_count + 2
   for ( var i = 2; i < size; i ++ ) {

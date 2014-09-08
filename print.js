@@ -24,6 +24,8 @@ function print(n, idx){
   var a = 0
   var guard = 1000
   var size = data[didx]
+  if ( size < 2 ) throw new Error('size should never be less than 2')
+  if ( size == 2 ) return console.log(''+n, data[didx]+ ', '+data[didx+1])
 //console.log('size', size)
   for ( var j = 0; j < size; j++ ) {
     //if ( a > 1 ) v.push(heap[pointer]  + ' * 65536^' + ( a - 2 ) )

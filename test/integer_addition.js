@@ -27,7 +27,7 @@ var zero = require('../zero.js')
 var get_new_zero = require('../get_new_zero.js')
 
 
-// var arb_int = as_generator(rand_int('small', 'simple', 'positive'))
+var arb_int = as_generator(rand_int('small', 'simple', 'positive'))
 
 var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
 
@@ -77,9 +77,13 @@ function associativity(a, b, c){
 }
 
 function commutativity(a, b){
-  // print ( 'a:', a)
-  // print ( 'b:', b)
-  var r =  equal(add(a, b), add(b, a))
+  //print ( 'a:', a)
+  //print ( 'b:', b)
+  var ab = add(a, b)
+  //print ( 'ab:', ab)
+  var ba = add(b, a)
+  //print ( 'ba:', ba)
+  var r =  equal(ab, ba)
   if ( ! equal(zero, get_new_zero()) ) throw new Error ( 'y u no 0')
   return r
 }
@@ -89,9 +93,6 @@ function identity(a){
   var nz = get_new_zero()
   var tz = memory.values[zero]
   var tnz = memory.values[nz]
-//console.log('p', memory.pointers[zero], memory.pointers[nz])
-//console.log('tz', dumpta(tz.ads), dumpta(tz.data))
-//console.log('tnz', dumpta(tnz.ads), dumpta(tnz.data))
   if ( ! equal(zero, nz) ) throw new Error ( 'y u no 0')
   return r
 }

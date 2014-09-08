@@ -1,30 +1,34 @@
 module.exports = compare
 var memory = require('./memory.js')
-var data = memory.data
-var ads = memory.ads
-function compare(a, b){
-  if ( a == b ) return 0
-  var aidx = ads[a]
-  var bidx = ads[b]
-  var a_length = data[aidx]
-  var b_length = data[bidx]
+var numbers = memory.numbers
+var pointers = memory.pointers
+var values = memory.values
+
+function compare(aidx, bidx){
+  if ( aidx == bidx ) return 0
+
+  var pointer_a = memory.pointers[aidx]
+  var t_a = memory.values[aidx]
+  var data_a = t_a.data
+  var didx_a = t_a.ads[pointer_a]
+
+  var pointer_b = memory.pointers[bidx]
+  var t_b = memory.values[bidx]
+  var data_b = t_b.data
+  var didx_b = t_b.ads[pointer_b]
+
+  var a_length = data_a[didx_a]
+  var b_length = data_b[didx_b]
+
   if ( a_length < b_length ) {
     return -1
   } else if ( b_length < a_length ) {
     return 1
   } else {
-    var as = []
-    var bs = []
-    while ( aidx != 0 ) {
-      as.push(data[aidx])
-      bs.push(data[bidx])
-      aidx = ads[aidx]
-      bidx = ads[bidx]
-    }
-    for ( var i = as.length - 1 ; i >= 0 ; i-- ) {
-      if ( as[i] < bs[i] ) {
+    for ( var i = a_length - 1; i > 0; i++ ) {
+      if ( data_a[didx_a + i] < data_b[didx_b + i] ) {
         return -1
-      } else if ( bs[i] < as[i] ) {
+      } else if ( data_a[didx_a + i] > data_b[didx_b + i] ) {
         return 1
       }
     }
