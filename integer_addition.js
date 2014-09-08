@@ -15,8 +15,15 @@ function add(A_idx, B_idx){
   if ( equal(A_idx, zero) ) return B_idx
   if ( equal(B_idx, zero) ) return A_idx
 
-  var size_a = values[A_idx].data[values[A_idx].ads[pointers[A_idx]]]
-  var size_b = values[B_idx].data[values[B_idx].ads[pointers[B_idx]]]
+  var pointer_a = pointers[A_idx]
+  var t_a = values[A_idx]
+  var pointer_b = pointers[B_idx]
+  var t_b = values[B_idx]
+
+  // this has to be repeated because
+  // it might change after allocate:
+  var size_a = t_a.data[t_a.ads[pointer_a]]
+  var size_b = t_b.data[t_b.ads[pointer_b]]
 
   if ( size_a >= size_b ) {
     var size_r = size_a + 1
@@ -27,13 +34,9 @@ function add(A_idx, B_idx){
     var data_r = t_r.data
     var didx_r = t_r.ads[pointer_r]
 
-    var pointer_a = pointers[A_idx]
-    var t_a = values[A_idx]
     var data_a = t_a.data
     var didx_a = t_a.ads[pointer_a]
 
-    var pointer_b = pointers[B_idx]
-    var t_b = values[B_idx]
     var data_b = t_b.data
     var didx_b = t_b.ads[pointer_b]
 
@@ -64,13 +67,9 @@ function add(A_idx, B_idx){
     var data_r = t_r.data
     var didx_r = t_r.ads[pointer_r]
 
-    var pointer_a = pointers[A_idx]
-    var t_a = values[A_idx]
     var data_a = t_a.data
     var didx_a = t_a.ads[pointer_a]
 
-    var pointer_b = pointers[B_idx]
-    var t_b = values[B_idx]
     var data_b = t_b.data
     var didx_b = t_b.ads[pointer_b]
 
