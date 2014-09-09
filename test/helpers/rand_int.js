@@ -22,19 +22,25 @@ positive, integer
 */
 
 function random_bigint(l, s, bigit){
-  var bigit_count = rint(l[0] + 2, l[1])
+  var minlength = l[0] + 2
+  var maxlength = Math.max(minlength, l[1])
+  var bigit_count = rint(minlength, maxlength)
   var idx = numbers(bigit_count)
   var pointer = pointers[idx]
   var t = values[idx]
   var didx = t.ads[pointer]
-  var data = t.data
 
-  data[didx + 1] = 0 // type
+  t.data[didx + 1] = 0 // type
   //if ( bigit_count > 0 ) { sign.change(idx, s == null ? rint(0, 1) : s) }
 
-  var size = bigit_count + 2
-  for ( var i = 2; i < size; i ++ ) {
-    data[didx + i] = rint(bigit[0], bigit[1]) // set min max on the integer generator
+  for ( var i = 2; i < bigit_count; i ++ ) {
+    if ( i == bigit_count -1 ) {
+      var min = bigit[0] == 0 ? 1 : bigit[0]
+      var max = bigit[1] == 0 ? 1 : bigit[1]
+      t.data[didx + i] = rint(min, max) // set min max on the integer generator
+    } else {
+      t.data[didx + i] = rint(bigit[0], bigit[1]) // set min max on the integer generator
+    }
   }
 
   return idx

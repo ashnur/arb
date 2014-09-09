@@ -12,10 +12,6 @@ var pointers = memory.pointers
 var values = memory.values
 
 function subtract(A_idx, B_idx){
-  //var pcdidx_a = values[A_idx].ads[pointers[A_idx]]
-  //var pcdidx_b = values[B_idx].ads[pointers[B_idx]]
-
-  //console.log('precheck', pcdidx_a , pcdidx_b)
 
   var comp = compare(A_idx, B_idx)
   if ( comp == 0 ) {
@@ -61,20 +57,8 @@ function subtract(A_idx, B_idx){
   for ( var i = 2; i < size_b; i ++ ) {
     r = data_a[didx_a + i] - data_b[didx_b + i] + carry
     if ( r < 0 ) {
-      var x1 = Math.max.apply(null, map(Object.keys(memory.pointers).filter(function(v){ return v != 0 }), getsize))
       data_r[didx_r + i] = r + 65536
       carry = -1
-      var x2 = Math.max.apply(null, map(Object.keys(memory.pointers).filter(function(v){ return v != 0 }), getsize))
-      //if ( x2 > x1 ) {
-      //  console.log('A data idx ->', didx_a)
-      //  print('A', A_idx)
-      //  console.log('B data idx ->', didx_b)
-      //  print('B', B_idx)
-      //  console.log('R data idx ->', didx_r)
-      //  console.log('R i', i)
-      //  print('R', R_idx)
-      //  console.log(dumpta(data_r))
-      //}
     } else {
       data_r[didx_r + i] = r
       carry = 0
@@ -92,8 +76,6 @@ function subtract(A_idx, B_idx){
   }
   data_r[didx_r + i] += carry
 
-
-
   //var zs = 0
   //while ( data_r[didx_r + i] == 0 && i > 1) {
   //  zs++
@@ -104,13 +86,3 @@ function subtract(A_idx, B_idx){
   return R_idx
 }
 
-function getsize(idx){
-  return memory.values[idx].data[memory.values[idx].ads[memory.pointers[idx]]]
-}
-
-function id(x, i){ return i+':'+x }
-
-function dumpta(ta){
-  return map(ta, id).join(', ')
-  //.replace(/(?:,0)*$/,'').split(',')
-}

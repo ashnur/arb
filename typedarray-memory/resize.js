@@ -1,6 +1,4 @@
 module.exports = resize
-var liberate = require('liberate')
-var map = liberate(Array.prototype.map)
 var Address = require('./address.js')
 
 var log = Math.log
@@ -14,12 +12,6 @@ function resize(arr, l, maxvalue){
   var r = Address(maxvalue, length)
   r.set(arr)
   return r
-}
-function id(x){ return x }
-
-function dumpta(ta){
-  return map(ta, id).join(',')
-  //.replace(/(?:,0)*$/,'').split(',')
 }
 
 

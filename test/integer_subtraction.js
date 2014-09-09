@@ -15,16 +15,16 @@ var log = console.log.bind(console)
 var analyzer = require('./claire-helpers/analyzer.js')
 var klara = require('./claire-helpers/klara.js')
 var print = require('../print.js')
+var liberate = require('liberate')
+var map = liberate(Array.prototype.map)
+var forEach = liberate(Array.prototype.forEach)
+var filter = liberate(Array.prototype.filter)
 
 function size(idx){
   return memory.values[idx].data[memory.values[idx].ads[memory.pointers[idx]]]
 }
 
 function subtract_sum(n, m, k){
- if ( Math.max.apply(null, [n, m, k].map(size)) > 10 ) throw new Error('why this?')
- print('n         ', n)
- print('m         ', m)
- print('k         ', k)
   var mk = add(m, k)
   var a = subtract(n, mk)
   var b = subtract(subtract(n, m), k)
@@ -72,11 +72,11 @@ var size_2_int = as_generator(rand_int.static_generator([10,19], 'complex', 'pos
 var size_3_int = as_generator(rand_int.static_generator([19,29], 'complex', 'positive'))
 var size_4_int = as_generator(rand_int.static_generator([20,29], 'complex', 'positive'))
 var size_5_int = as_generator(rand_int.static_generator([1,100], 'complex', 'positive'))
-var size_1_int = as_generator(rand_int.static_generator([1,2], 'simple', 'positive'))
-var size_2_int = as_generator(rand_int.static_generator([3,4], 'simple', 'positive'))
-var size_3_int = as_generator(rand_int.static_generator([5,6], 'simple', 'positive'))
-var size_4_int = as_generator(rand_int.static_generator([7,8], 'simple', 'positive'))
-var size_5_int = as_generator(rand_int.static_generator([9,10], 'simple', 'positive'))
+//var size_1_int = as_generator(rand_int.static_generator([1,2], 'simple', 'positive'))
+//var size_2_int = as_generator(rand_int.static_generator([3,4], 'simple', 'positive'))
+//var size_3_int = as_generator(rand_int.static_generator([5,6], 'simple', 'positive'))
+//var size_4_int = as_generator(rand_int.static_generator([7,8], 'simple', 'positive'))
+//var size_5_int = as_generator(rand_int.static_generator([9,10], 'simple', 'positive'))
 var props = [
   { title : 'subtract_sum'
   , fn  : subtract_sum
@@ -84,20 +84,20 @@ var props = [
   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
   , end: memory.reset
   }
-// ,
-//  { title : 'add_difference'
-//  , fn  : add_difference
-//  , args:  [size_5_int, size_2_int, size_1_int]
-//  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-//  , end: memory.reset
-//  }
-//,
-//  { title : 'subtract_difference'
-//  , fn  : subtract_difference
-//  , args: [size_4_int, size_2_int, size_1_int]
-//  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-//  , end: memory.reset
-//  }
+ ,
+  { title : 'add_difference'
+  , fn  : add_difference
+  , args:  [size_5_int, size_2_int, size_1_int]
+  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
+  , end: memory.reset
+  }
+,
+  { title : 'subtract_difference'
+  , fn  : subtract_difference
+  , args: [size_4_int, size_2_int, size_1_int]
+  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
+  , end: memory.reset
+  }
 ]
 
-klara(100, props)
+klara(1000, props)

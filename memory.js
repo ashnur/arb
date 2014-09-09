@@ -29,8 +29,6 @@ function init(){
          , reset: reset }
 }
 
-
-
 function reset(){
 //  init()
 }
@@ -45,4 +43,5 @@ function factory(t){
     return n++
   }
 }
+
 
