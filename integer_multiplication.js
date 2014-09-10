@@ -55,15 +55,15 @@ function multiply(A_idx, B_idx){
   }
 
 
-  var zs = 0
+  var trailing_zeroes = 0
   var k = size_a + size_b - 3 + didx_t
   while ( k > didx_t + 2 && data_t[k] == 0) {
     k--
-    zs++
+    trailing_zeroes++
   }
 
-  var size_r = size_a + size_b  - zs - 2
-  if ( zs ) data_t[didx_t] = size_r
+  var size_r = size_a + size_b  - trailing_zeroes - 2
+  if ( trailing_zeroes ) data_t[didx_t] = size_r
 
   var R_idx = numbers(size_r)
   var pointer_r = pointers[R_idx]
