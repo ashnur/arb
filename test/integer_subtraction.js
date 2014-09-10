@@ -72,11 +72,11 @@ var size_2_int = as_generator(rand_int.static_generator([10,19], 'complex', 'pos
 var size_3_int = as_generator(rand_int.static_generator([19,29], 'complex', 'positive'))
 var size_4_int = as_generator(rand_int.static_generator([20,29], 'complex', 'positive'))
 var size_5_int = as_generator(rand_int.static_generator([1,100], 'complex', 'positive'))
-//var size_1_int = as_generator(rand_int.static_generator([1,2], 'simple', 'positive'))
-//var size_2_int = as_generator(rand_int.static_generator([3,4], 'simple', 'positive'))
-//var size_3_int = as_generator(rand_int.static_generator([5,6], 'simple', 'positive'))
-//var size_4_int = as_generator(rand_int.static_generator([7,8], 'simple', 'positive'))
-//var size_5_int = as_generator(rand_int.static_generator([9,10], 'simple', 'positive'))
+var size_1_int = as_generator(rand_int.static_generator([15,16], 'simple', 'positive'))
+var size_2_int = as_generator(rand_int.static_generator([16,17], 'complex', 'positive'))
+var size_3_int = as_generator(rand_int.static_generator([17,18], 'simple', 'positive'))
+var size_4_int = as_generator(rand_int.static_generator([18,19], 'simple', 'positive'))
+var size_5_int = as_generator(rand_int.static_generator([19,20], 'simple', 'positive'))
 var props = [
   { title : 'subtract_sum'
   , fn  : subtract_sum
@@ -101,3 +101,23 @@ var props = [
 ]
 
 klara(1000, props)
+// var A = num([9,9,9,9,9,9,9,9])
+// var B = num([8,9,9,9,9,9,9,9])
+// var z = subtract(A, B)
+// print('A - B', z )
+//
+// function num(arr){
+//   var id = memory.numbers(arr.length + 2)
+//   var t = memory.values[id]
+//   var p = memory.pointers[id]
+//   var data = t.data
+//   var didx = t.ads[p]
+//   data[didx + 1] = 0
+//   for ( var i = 2; i < data[didx]; i++ ) {
+//     data[didx + i] = arr[i - 2]
+//   }
+//   return id
+// }
+//
+//
+//

@@ -76,11 +76,11 @@ function subtract(A_idx, B_idx){
   }
   data_r[didx_r + i] += carry
 
-  var zs = 0
+  var trailing_zeroes = 0
   while ( data_r[didx_r + (--i)] == 0 && i > 1) {
-    zs++
+    trailing_zeroes++
   }
-  if ( zs ) data_r[didx_r] = size_r - zs
+  if ( trailing_zeroes ) data_r[didx_r] = size_r - trailing_zeroes
 
   return R_idx
 }
