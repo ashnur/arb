@@ -25,8 +25,8 @@ function check_property(count, property){
     if ( results.failed.length == 0 ) {
       t.pass('all test passed')
     }
-//    console.log(results+'', findlast(memory.stacks.data), findlast(memory.stacks.ads))
-    endsize()
+    console.log(results+'')// , findlast(memory.stacks.data), findlast(memory.stacks.ads))
+//    endsize()
     property.end()
     t.end()
   })
@@ -37,7 +37,7 @@ function run(count, properties){
     return check_property(count || 100, prop)
   })
 }
-function endsize(){console.log(memory.naives.data.length, memory.stacks.data.length)}
+function endsize(){console.log('end size', memory.naives.data.length, memory.naives.ads.length, memory.stacks.data.length, memory.stacks.ads.length)}
 function findlast(ta){
   var last = 0
   for ( var i = 0; i < ta.length; i++ ) {

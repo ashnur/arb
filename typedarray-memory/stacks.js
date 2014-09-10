@@ -33,6 +33,7 @@ function Memory(type, size, silent){
     var pointer = next
     next++
     if ( pointer == heap.ads.length ) {
+      console.log('alloc', heap.ads.BYTES_PER_ELEMENT, heap.ads.length * 2, heap.data.length)
       heap.ads = resize(heap.ads, heap.ads.length * 2, heap.data.length)
     }
     heap.ads[pointer] = data_idx
@@ -52,7 +53,11 @@ function Memory(type, size, silent){
     var cl  = heap.data.length
     var nl = max(cl * 2, cl - unallocated + needed)
     if ( nl >= Math.pow(2, heap.ads.BYTES_PER_ELEMENT) ) {
-      heap.ads = resize(heap.ads, heap.ads.length * 2, nl)
+//      console.log('extend', heap.ads.BYTES_PER_ELEMENT, heap.ads.length, nl)
+//      console.log('brk', brk)
+//      console.log('next', next)
+//      console.log('last adrs', findlast(heap.ads))
+      heap.ads = resize(heap.ads, heap.ads.length , nl)
     }
     var update = resize_naive(heap.ads, next, heap.data, nl, brk)
     heap.data = update.data
@@ -62,4 +67,11 @@ function Memory(type, size, silent){
 
   return heap
 
+}
+function findlast(ta){
+  var last = 0
+  for ( var i = 0; i < ta.length; i++ ) {
+    if ( ta[i] > 0 ) last = i
+  }
+  return last
 }
