@@ -1,51 +1,82 @@
 module.exports = multiply
 var memory = require('./memory.js')
-var data = memory.data
-var alloc = memory.alloc
-var ads = memory.ads
-var free = memory.free
-var type = require('./type.js')
-var right_trim = require('./integer_right_trim.js')
+var numbers = memory.numbers
+var temp = memory.temp
+var pointers = memory.pointers
+var values = memory.values
+
 var one = require('./one.js')
 var zero = require('./zero.js')
 var equal = require('./integer_equality.js')
 var add = require('./integer_addition.js')
 var addp = require('./integer_add_primitive.js')
 var print = require('./print.js')
-var clone = require('./clone.js')
 
-function multiply(A, B){
-  if ( equal(A, zero) ) return clone(zero)
-  if ( equal(B, zero) ) return clone(zero)
-  if ( equal(A, one) ) return clone(B)
-  if ( equal(B, one) ) return clone(A)
-  var aidx = ads[A]
-  var bidx = ads[B]
-  var A_size = data[aidx]
-  var B_size = data[bidx]
-  var R_size = A_size + B_size
+function multiply(A_idx, B_idx){
+  if ( equal(A_idx, zero) ) return zero
+  if ( equal(B_idx, zero) ) return zero
+  if ( equal(A_idx, one) ) return B_idx
+  if ( equal(B_idx, one) ) return A_idx
 
-  var r = 0
-  var i = 0
-  aidx = ads[aidx]
-  bidx = ads[bidx]
-  var R = zero
-  var RR = 0
-  while ( aidx != 0 ) {
-    var a = data[aidx]
-    var j = 0
-    while ( bidx != 0 ) {
-      var b = data[bidx]
-      r = a * b
-      var PP = RR || R
-      var RR = addp(PP, r, i + j)
-      if ( PP != 0 && PP != zero ) free(PP)
-      bidx = ads[bidx]
-      j ++
+  var pointer_a = pointers[A_idx]
+  var t_a = values[A_idx]
+  var data_a = t_a.data
+  var didx_a = t_a.ads[pointer_a]
+
+  var pointer_b = pointers[B_idx]
+  var t_b = values[B_idx]
+  var data_b = t_b.data
+  var didx_b = t_b.ads[pointer_b]
+
+  var size_a = data_a[didx_a]
+  var size_b = data_b[didx_b]
+
+
+  var t = temp(size_a + size_b - 2) // header(2 blocks) is in both, so has to be removed
+  var pointer_t = pointers[t]
+  var t_t = values[t]
+  var data_t = t_t.data
+  var didx_t = t_t.ads[pointer_t]
+
+  data_t[didx_t + 1] = 0 // type integer
+  for ( var i = 2; i < data_t[didx_t]; i++ ) data_t[didx_t + i] = 0
+
+  var tj = 0
+  var c = 0
+  var n = 0
+
+  for ( var i = 2; i < size_a; i++ ) {
+    var a = data_a[didx_a + i]
+    n = 0
+    for ( var j = 2; j < size_b; j++ ) {
+      c = n
+      tj = a * data_b[didx_b + j] + data_t[didx_t + i + j - 2] + c
+      data_t[didx_t + i + j - 2] = tj & 65535
+      n = tj >>> 16
     }
-    aidx = ads[aidx]
-    bidx = ads[ads[B]]
-    i ++
+    data_t[didx_t + i + size_b - 2] = n
   }
-  return right_trim(RR)
+
+
+  var zs = 0
+  var k = size_a + size_b - 3 + didx_t
+  while ( k > didx_t + 2 && data_t[k] == 0) {
+    k--
+    zs++
+  }
+
+  var size_r = size_a + size_b  - zs - 2
+  if ( zs ) data_t[didx_t] = size_r
+
+  var R_idx = numbers(size_r)
+  var pointer_r = pointers[R_idx]
+  var t_r = values[R_idx]
+  data_r = t_r.data
+  didx_r = t_r.ads[pointer_r]
+  for ( var l = 0; l < size_r; l++ ) {
+    data_r[didx_r + l] = data_t[didx_t + l]
+  }
+  memory.stacks.free(pointer_t)
+
+  return R_idx
 }

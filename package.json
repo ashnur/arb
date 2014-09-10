@@ -29,6 +29,7 @@
     "biginteger": "*",
     "claire": "*",
     "liberate": "^1.0.1",
+    "tap-spec": "^0.2.1",
     "tape": "*"
   },
   "dependencies": {

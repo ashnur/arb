@@ -1,4 +1,5 @@
 var memory = require('../memory.js')
+
 var multiply = require('../integer_multiplication.js')
 var rand_int = require('./helpers/rand_int.js')
 var claire = require('claire')
@@ -7,6 +8,7 @@ var arb_int = as_generator(rand_int.static_generator([1,20], 'complex', 'positiv
 var equal = require('../integer_equality.js')
 var one = require('../one.js')
 var liberate = require('liberate')
+var map = liberate(Array.prototype.map)
 var log = console.log.bind(console)
 var klara = require('./claire-helpers/klara.js')
 var analyzer = require('./claire-helpers/analyzer.js')
@@ -43,6 +45,7 @@ function commutativity(a, b){
     print('b', b)
     print('ab', ab)
     print('ba', ba)
+    console.log(tomul(a, b))
   }
   return r
 }
@@ -58,13 +61,14 @@ function cleanup(){
 }
 
 var props = [
-  { title : 'identity'
-  , fn: identity
-  , args: [arb_int]
-  , analyze: analyzer(bigint_analyzer)
-  , end: memory.reset
-  }
-, { title : 'commutativity'
+{ title : 'identity'
+, fn: identity
+, args: [arb_int]
+, analyze: analyzer(bigint_analyzer)
+, end: memory.reset
+}
+,
+ { title : 'commutativity'
   , fn: commutativity
   , args: [arb_int, arb_int]
   , analyze: analyzer(bigint_analyzer, bigint_analyzer)
@@ -82,6 +86,8 @@ var props = [
 // var to_int = require('../primitive_to_int.js')
 // var A = to_int(65541)
 // var B = to_int(393217)
+// var A = num([16688])
+// var B = num([44613 , 10586])
 // var z = multiply(A, B)
 // var t = multiply(B, A)
 // print('A * B', z )
@@ -89,3 +95,43 @@ var props = [
 // console.log('equal', equal(t, z))
 
 klara(1000, props)
+
+
+function topoly(c, p){ return c + '*' + '(2^16)^' + p }
+function toarr(id){
+  var t = memory.values[id]
+  var p = memory.pointers[id]
+  var data = t.data
+  var didx = t.ads[p]
+  var arr = []
+  var size = data[didx]
+  var idx = didx + 2
+  while ( idx < didx + size ) {
+    arr.push(data[idx++])
+  }
+  return arr
+}
+function topolynom(a){
+  return '(' + toarr(a).map(topoly).join('+') + ')'
+}
+function tomul(a, b){
+  var A = topolynom(a)
+  var B = topolynom(b)
+  return 'convert ' +A + '*' + B + ' to base 65536'
+}
+
+function num(arr){
+  var id = memory.numbers(arr.length + 2)
+  var t = memory.values[id]
+  var p = memory.pointers[id]
+  var data = t.data
+  var didx = t.ads[p]
+  data[didx + 1] = 0
+  for ( var i = 2; i < data[didx]; i++ ) {
+    data[didx + i] = arr[i - 2]
+  }
+  return id
+}
+
+
+

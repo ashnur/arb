@@ -52,7 +52,6 @@ function Memory(type, size, silent){
   }
 
   function extend(needed){
-    var obrk = brk
     var cl  = heap.data.length
     var nl = max(cl * 2, cl - unallocated + needed)
     if ( nl >= Math.pow(2, heap.ads.BYTES_PER_ELEMENT) ) {

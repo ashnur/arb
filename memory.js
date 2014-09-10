@@ -26,7 +26,11 @@ function init(){
          , temp: factory(temp)
          , values: values
          , pointers: pointers
-         , reset: reset }
+         , reset: reset
+         , naives: numbers
+         , consts: constants
+         , stacks: temp
+         }
 }
 
 function reset(){

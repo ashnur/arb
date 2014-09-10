@@ -11,7 +11,8 @@ var zero = require('./zero.js')
 var equal = require('./integer_equality.js')
 
 
-function add(A_idx, B_idx){
+function add(A_idx, B_idx, storage){
+  storage = storage || numbers
   if ( equal(A_idx, zero) ) return B_idx
   if ( equal(B_idx, zero) ) return A_idx
 
@@ -27,7 +28,7 @@ function add(A_idx, B_idx){
 
   if ( size_a >= size_b ) {
     var size_r = size_a + 1
-    var R_idx = numbers(size_r)
+    var R_idx = storage(size_r)
 
     var pointer_r = pointers[R_idx]
     var t_r = values[R_idx]
