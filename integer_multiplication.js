@@ -8,9 +8,6 @@ var values = memory.values
 var one = require('./one.js')
 var zero = require('./zero.js')
 var equal = require('./integer_equality.js')
-var add = require('./integer_addition.js')
-var addp = require('./integer_add_primitive.js')
-var print = require('./print.js')
 
 function multiply(A_idx, B_idx){
   if ( equal(A_idx, zero) ) return zero
