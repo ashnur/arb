@@ -33,7 +33,6 @@ function Memory(type, size, silent){
     var pointer = next
     next++
     if ( pointer == heap.ads.length ) {
-      console.log('alloc', heap.ads.BYTES_PER_ELEMENT, heap.ads.length * 2, heap.data.length)
       heap.ads = resize(heap.ads, heap.ads.length * 2, heap.data.length)
     }
     heap.ads[pointer] = data_idx
