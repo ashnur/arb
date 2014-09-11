@@ -13,9 +13,11 @@ var slice = liberate(Array.prototype.slice)
 var join = liberate(Array.prototype.join)
 
 var max = Math.max
+var min = Math.min
 var log = console.log.bind(console)
 
 var memory = require('../memory.js')
+var temp = memory.temp
 
 var add = require('../integer_addition.js')
 var equal = require('../integer_equality.js')
@@ -36,21 +38,27 @@ var props = [
   , fn: identity
   , args: [arb_int]
   , analyze: analyzer(bigint_analyzer)
-  , end: memory.reset
+  , end: function(){
+      memory.stacks.free(1)
+    }
   }
 ,
   { title : 'commutativity'
   , fn: commutativity
   , args: [arb_int, arb_int]
   , analyze: analyzer(bigint_analyzer, bigint_analyzer)
-  , end: memory.reset
+  , end: function(){
+      memory.stacks.free(1)
+    }
   }
 ,
   { title : 'associativity'
   , fn: associativity
   , args: [arb_int, arb_int, arb_int]
   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-  , end: memory.reset
+  , end: function(){
+      memory.stacks.free(1)
+    }
   }
 ]
 
@@ -58,13 +66,13 @@ function associativity(a, b, c){
 // print ( 'a:', a)
 // print ( 'b:', b)
 // print ( 'c:', c)
-  var ab = add(a, b)
-  var bc = add(b, c)
+  var ab = add(a, b, temp)
+  var bc = add(b, c, temp)
 // print ( 'ab:', ab)
 // print ( 'bc:', bc)
 //
-  var x = add(a, bc)
-  var y = add(ab, c)
+  var x = add(a, bc, temp)
+  var y = add(ab, c, temp)
 // print ( 'a:', a)
 // print ( 'b:', b)
 // print ( 'c:', c)
@@ -79,9 +87,9 @@ function associativity(a, b, c){
 function commutativity(a, b){
   //print ( 'a:', a)
   //print ( 'b:', b)
-  var ab = add(a, b)
+  var ab = add(a, b, temp)
   //print ( 'ab:', ab)
-  var ba = add(b, a)
+  var ba = add(b, a, temp)
   //print ( 'ba:', ba)
   var r =  equal(ab, ba)
   if ( ! equal(zero, get_new_zero()) ) throw new Error ( 'y u no 0')
@@ -89,7 +97,7 @@ function commutativity(a, b){
 }
 
 function identity(a){
-  var r = equal(add(a, zero), a)
+  var r = equal(add(a, zero, temp), a)
   var nz = get_new_zero()
   var tz = memory.values[zero]
   var tnz = memory.values[nz]

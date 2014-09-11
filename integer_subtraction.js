@@ -11,7 +11,8 @@ var numbers = memory.numbers
 var pointers = memory.pointers
 var values = memory.values
 
-function subtract(A_idx, B_idx){
+function subtract(A_idx, B_idx, storage){
+  storage = storage || numbers
 
   var comp = compare(A_idx, B_idx)
   if ( comp == 0 ) {
@@ -24,7 +25,6 @@ function subtract(A_idx, B_idx){
     var temp = A_idx
     A_idx = B_idx
     B_idx = temp
-
   }
 
   var pointer_a = pointers[A_idx]
@@ -32,7 +32,7 @@ function subtract(A_idx, B_idx){
 
   var size_r = t_a.data[t_a.ads[pointer_a]]
 
-  var R_idx = memory.numbers(size_r)
+  var R_idx = storage(size_r)
 
   var data_a = t_a.data
   var didx_a = t_a.ads[pointer_a]
