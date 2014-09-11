@@ -34,6 +34,7 @@ function add(A_idx, B_idx, storage){
     var t_r = values[R_idx]
     var data_r = t_r.data
     var didx_r = t_r.ads[pointer_r]
+    data_r[didx_r + size_r - 1] = 0 // possible garbage cleanup
 
     var data_a = t_a.data
     var didx_a = t_a.ads[pointer_a]
@@ -67,6 +68,7 @@ function add(A_idx, B_idx, storage){
     var t_r = values[R_idx]
     var data_r = t_r.data
     var didx_r = t_r.ads[pointer_r]
+    data_r[didx_r + size_r - 1] = 0 // possible garbage cleanup
 
     var data_a = t_a.data
     var didx_a = t_a.ads[pointer_a]
