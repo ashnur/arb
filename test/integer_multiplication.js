@@ -1,4 +1,5 @@
 var memory = require('../memory.js')
+var temp = memory.temp
 
 var multiply = require('../integer_multiplication.js')
 var rand_int = require('./helpers/rand_int.js')
@@ -16,10 +17,10 @@ var print = require('../print.js')
 
 
 function associativity(a, b, c){
-  var ab = multiply(a, b)
-  var bc = multiply(b, c)
-  var ab_c = multiply(ab, c)
-  var a_bc = multiply(a, bc)
+  var ab = multiply(a, b, temp)
+  var bc = multiply(b, c, temp)
+  var ab_c = multiply(ab, c, temp)
+  var a_bc = multiply(a, bc, temp)
   var r = equal(ab_c, a_bc)
   if ( ! r ) {
     print('a', a)
@@ -37,8 +38,8 @@ function associativity(a, b, c){
 }
 
 function commutativity(a, b){
-  var ab = multiply(a, b)
-  var ba = multiply(b, a)
+  var ab = multiply(a, b, temp)
+  var ba = multiply(b, a, temp)
   var r = equal(ab, ba)
   if ( ! r ) {
     print('a', a)
@@ -51,7 +52,7 @@ function commutativity(a, b){
 }
 
 function identity(a){
-  return equal(multiply(a, one), a)
+  return equal(multiply(a, one, temp), a)
 }
 
 var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
@@ -61,25 +62,25 @@ function cleanup(){
 }
 
 var props = [
-{ title : 'identity'
-, fn: identity
-, args: [arb_int]
-, analyze: analyzer(bigint_analyzer)
-, end: memory.reset
-}
+  { title : 'identity'
+  , fn: identity
+  , args: [arb_int]
+  , analyze: analyzer(bigint_analyzer)
+  , end: function(){ memory.stacks.free(1) }
+  }
 ,
  { title : 'commutativity'
   , fn: commutativity
   , args: [arb_int, arb_int]
   , analyze: analyzer(bigint_analyzer, bigint_analyzer)
-  , end: memory.reset
+  , end: function(){ memory.stacks.free(1) }
   }
 ,
   { title : 'associativity'
   , fn: associativity
   , args: [arb_int, arb_int, arb_int]
   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-  , end: memory.reset
+  , end: function(){ memory.stacks.free(1) }
   }
 ]
 
