@@ -9,7 +9,13 @@ var one = require('./one.js')
 var zero = require('./zero.js')
 var equal = require('./integer_equality.js')
 
-function multiply(A_idx, B_idx, storage){
+var print = require('./print.js')
+
+var max = Math.max
+var liberate = require('liberate')
+var map = liberate(Array.prototype.map)
+
+function multiply(A_idx, B_idx, storage) {
   if ( equal(A_idx, zero) ) return zero
   if ( equal(B_idx, zero) ) return zero
   if ( equal(A_idx, one) ) return B_idx
@@ -18,26 +24,30 @@ function multiply(A_idx, B_idx, storage){
 
   var pointer_a = pointers[A_idx]
   var t_a = values[A_idx]
-  var data_a = t_a.data
-  var didx_a = t_a.ads[pointer_a]
 
   var pointer_b = pointers[B_idx]
   var t_b = values[B_idx]
+
+  var size_a = t_a.data[t_a.ads[pointer_a]]
+  var size_b = t_b.data[t_b.ads[pointer_b]]
+
+  var t = temp(size_a + size_b - 2) // header(2 blocks) is in both, so has to be removed
+  // console.log('----------------------------------', get_max_size())
+
+  var data_a = t_a.data
+  var didx_a = t_a.ads[pointer_a]
+
   var data_b = t_b.data
   var didx_b = t_b.ads[pointer_b]
 
-  var size_a = data_a[didx_a]
-  var size_b = data_b[didx_b]
-
-
-  var t = temp(size_a + size_b - 2) // header(2 blocks) is in both, so has to be removed
   var pointer_t = pointers[t]
   var t_t = values[t]
+
   var data_t = t_t.data
   var didx_t = t_t.ads[pointer_t]
 
   data_t[didx_t + 1] = 0 // type integer
-  for ( var i = 2; i < data_t[didx_t]; i++ ) data_t[didx_t + i] = 0
+  for ( var i = 2; i < data_t[didx_t]; i++ ) data_t[didx_t + i] = 0 // get rid of garbage
 
   var tj = 0
   var c = 0
@@ -66,6 +76,7 @@ function multiply(A_idx, B_idx, storage){
   var size_r = size_a + size_b  - trailing_zeroes - 2
   if ( trailing_zeroes ) data_t[didx_t] = size_r
 
+
   var R_idx = storage(size_r)
   var pointer_r = pointers[R_idx]
   var t_r = values[R_idx]
@@ -74,7 +85,24 @@ function multiply(A_idx, B_idx, storage){
   for ( var l = 0; l < size_r; l++ ) {
     data_r[didx_r + l] = data_t[didx_t + l]
   }
-  memory.stacks.free(pointer_t)
+  memory.stacks.free(pointer_r)
 
   return R_idx
+}
+function size(didx, index){
+  return [index, didx, memory.stacks.data[didx]]
+}
+
+function th(n){ return function(tuple){ return tuple[n] } }
+
+function max_size(sizes){
+  var from = sizes.map(th(2))
+  //console.log(from)
+  return max.apply(null, from)
+}
+
+function get_max_size(){
+  var sizes = map(memory.stacks.ads, size)
+  //console.log(memory.stacks.ads.length,memory.stacks.data.length, sizes)
+  return max_size(sizes)
 }

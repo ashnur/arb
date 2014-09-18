@@ -25,7 +25,7 @@ function compare(aidx, bidx){
   } else if ( b_length < a_length ) {
     return 1
   } else {
-    for ( var i = a_length - 1; i > 0; i++ ) {
+    for ( var i = a_length - 1; i > 0; i-- ) {
       if ( data_a[didx_a + i] < data_b[didx_b + i] ) {
         return -1
       } else if ( data_a[didx_a + i] > data_b[didx_b + i] ) {

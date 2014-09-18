@@ -95,7 +95,10 @@ var props = [
 // print('B * A', t )
 // console.log('equal', equal(t, z))
 
-klara(1000, props)
+var times = 1000
+while ( times -- > 0 ) {
+  klara(10, props)
+}
 
 
 function topoly(c, p){ return c + '*' + '(2^16)^' + p }

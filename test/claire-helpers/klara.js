@@ -6,10 +6,13 @@ var claire = require('claire')
 var for_all = claire.forAll
 var check = claire.check
 var memory = require('../../memory.js')
+var bb = require('bluebird')
+bb.onPossiblyUnhandledRejection(function(){  })
 
 function value(size, gen){ return claire.value(size, gen, gen) }
 
 function check_property(count, property){
+  var resolver = bb.pending()
   test(property.title, function(t){
     var checks = for_all.apply(null, property.args)
                       .satisfy(property.fn)
@@ -20,20 +23,25 @@ function check_property(count, property){
 
     var results = check(count, checks)
     results.failed.forEach(function(result){
+      resolver.reject(result)
       t.fail('')
     })
+
     if ( results.failed.length == 0 ) {
+      resolver.resolve()
       t.pass('all test passed')
     }
+
     console.log(results+'')// , findlast(memory.stacks.data), findlast(memory.stacks.ads))
-//    endsize()
+    endsize()
     property.end()
     t.end()
   })
+  return resolver.promise
 }
 
 function run(count, properties){
-  return properties.forEach(function(prop, idx, properties){
+  return properties.map(function(prop, idx, properties){
     return check_property(count || 100, prop)
   })
 }

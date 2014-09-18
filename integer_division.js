@@ -1,182 +1,249 @@
 module.exports = divide
 // http://bioinfo.ict.ac.cn/~dbu/AlgorithmCourses/Lectures/Hasselstrom2003.pdf
 // http://www.treskal.com/kalle/exjobb/original-report.pdf
+var noop = function(){}
+var console_log = noop // console.log.bind(console)
 var memory = require('./memory.js')
-var data = memory.data
-var ads = memory.ads
+var pointers = memory.pointers
+var values = memory.values
+var numbers = memory.numbers
+var temp = memory.temp
+
 var one = require('./one.js')
 var zero = require('./zero.js')
+var β = require('./65536.js')
+
 var compare = require('./integer_compare_abs.js')
 var equal = require('./integer_equality.js')
 var add = require('./integer_addition.js')
-var addp = require('./integer_add_primitive.js')
 var subtract = require('./integer_subtraction.js')
 var multiply = require('./integer_multiplication.js')
-var right_trim = require('./integer_right_trim.js')
+
 var left_shift = require('./integer_left_shift.js')
 var right_shift = require('./integer_right_shift.js')
+
 var to_int = require('./primitive_to_int.js')
-var log = console.log.bind(console)
+
 var floor = Math.floor
+var ceil = Math.ceil
+var log = Math.log
+var LN2 = Math.LN2
 var base = 65536
 var half_base = base / 2
 
 var print = require('./print.js')
-//var guard = 100
-function sub(A, B){
-//  if( ! (--guard) ) throw new Error ('nope')
-  var BR = left_shift(B, 16)
-//print('A ', A)
-//print('B ', B)
-//print('BR', BR)
-//console.log('comp', compare(A, BR))
-  if ( compare(A, BR) >= 0  ) {
-    var t = slowdiv(subtract(A, BR), B)
-    memory.free(BR)
-    return [addp(t[0], base), t[1]]
+
+var max = Math.max
+var liberate = require('liberate')
+var map = liberate(Array.prototype.map)
+
+var path = 0
+
+function sub(A_idx, B_idx){
+  var pointer_b = pointers[B_idx]
+  var t_b = values[B_idx]
+  var data_b = t_b.data
+  var didx_b = t_b.ads[pointer_b]
+  var size_b = data_b[didx_b]
+  var BR_idx = temp(size_b + 1)
+
+  var pointer_br = pointers[BR_idx]
+  var t_br = values[BR_idx]
+  var data_br = t_br.data
+  var didx_br = t_br.ads[pointer_br]
+
+  data_br[didx_br + 1] = 0 // type integer
+  data_br[didx_br + 2] = 0 // some garbage might be there
+
+  // left shifting(actually right because order is reversed, although 
+  // if I index bigits the same way bits usually are, it's 
+  // still left, very confusing naming and conventions, really)
+  for ( var i = 2; i < size_b; i++ ) {
+    data_br[didx_br + i + 1] = data_b[didx_b + i]
   }
 
-  // n is the last element
-  // var n = A.length - 1
-  // find size of A
-  var a_size = data[ads[A]]
-  // here we are reading the penultimate elements, second most significant elements
-  // if last index is more than two, so the size is more than 1 (before this version size 2 was 0, single digits were size 3. now we subtract 2)
-  // we use 2nd msd, otherwise 0
-  // var A_p = n > 2 ? A[n - 1] : 0
-  // var B_p = n > 2 ? B[n - 1] : 0
-
-  if ( a_size > 1 ) {
-    // find last 2 indeces of A
-    var asmsdidx = ads[ads[A]]
-    var amsdidx = ads[asmsdidx]
-    var next_aidx = ads[amsdidx]
-//console.log('az', asmsdidx, amsdidx, next_aidx)
-    while ( next_aidx != 0 ) {
-      var asmsdidx = amsdidx
-      var amsdidx = next_aidx
-      var next_aidx = ads[next_aidx]
-    }
-    // find last 2 indeces of B
-    var bmsdidx = ads[ads[B]]
-    var next_bidx = ads[bmsdidx]
-    while ( next_bidx != 0 ) {
-      var bmsdidx = next_bidx
-      var next_bidx = ads[next_bidx]
-    }
-    var A_msd = data[amsdidx]
-    var A_p = data[asmsdidx]
-    var B_p = data[bmsdidx]
-  } else {
-    var A_p =  0
-    var B_p =  0
+  if ( compare(A_idx, BR_idx) >= 0  ) {
+   var C = subtract(A_idx, BR_idx, temp)
+   var t = slowdiv(C, B_idx)
+    return [add(t[0], β, temp), t[1]]
   }
+  var pointer_a = pointers[A_idx]
+  var t_a = values[A_idx]
+  var data_a = t_a.data
+  var didx_a = t_a.ads[pointer_a]
 
+  var size_a = data_a[didx_a]
 
-  var q = floor((base * data[amsdidx] + A_p) / B_p)
-//console.log('aix', asmsdidx, amsdidx)
-//console.log('ax', A_p, A_msd)
-//console.log('bix', bmsdidx)
-//console.log('bx', B_p)
-//console.log('(base * data[amsdidx] + A_p)', (base * data[amsdidx] + A_p))
-//console.log('q', q)
-//console.log('q > base - 1', q > base - 1)
-
-
-  // after this, no modifications are needed
+  //TODO: this to be removed
+  if ( size_a < 4 ) throw new Error('size too small')
+  var q = floor((base * data_a[didx_a + size_a - 1] + data_a[didx_a + size_a - 2]) / data_b[didx_b + size_b - 1])
 
   if ( q > base - 1 ) q = base - 1
-  var Q = to_int(q)
-  var T = multiply(Q, B)
-  if ( compare(T, A) > 0 ) {
+  var Q = temp(3)
+  var pointer_q = pointers[Q]
+  var t_q = values[Q]
+  var data_q = t_q.data
+  var didx_q = t_q.ads[pointer_q]
+  data_q[didx_q + 1] = 0 // type integer
+  data_q[didx_q + 2] = q // value
+
+  var T = multiply(Q, B_idx, temp)
+  var corrected = false
+  if ( compare(T, A_idx) > 0 ) {
     q = q - 1
-    var T1 = subtract(T, B)
-    memory.free(T)
+    var T = subtract(T, B_idx, temp)
+    corrected = true
   }
-  if ( compare(T1 || T, A) > 0 ) {
+  if ( compare(T, A_idx) > 0 ) {
     q = q - 1
-    var T2 = subtract(T1, B)
-    if ( T1 != one && T1 != zero) memory.free(T1)
+    var T = subtract(T, B_idx, temp)
   }
-  return [to_int(q), subtract(A, T2 || T1 || T)]
+  if ( corrected ) {
+    var Q = temp(3)
+    var pointer_q = pointers[Q]
+    var t_q = values[Q]
+    var data_q = t_q.data
+    var didx_q = t_q.ads[pointer_q]
+    data_q[didx_q + 1] = 0 // type integer
+    data_q[didx_q + 2] = q // value
+  }
+  return [Q, subtract(A_idx, T, temp)] 
 }
 
-function slowdiv(A, B){
+function slowdiv(A_idx, B_idx){
+  //console.log('MAXSIZE', get_max_size())
 
-  // find B's most significant digit's index
-  var next_index = ads[ads[B]]
-  do {
-    var bmsdidx = next_index
-    next_index = ads[next_index]
-  } while ( next_index != 0 )
+  var pointer_b = pointers[B_idx]
+  var t_b = values[B_idx]
+  var data_b = t_b.data
+  var didx_b = t_b.ads[pointer_b]
+  var size_b = data_b[didx_b]
+  var most_significant_digit_b = data_b[didx_b + size_b - 1]
+  if ( most_significant_digit_b < 32768 ) {
 
-  if ( data[bmsdidx] < 32768 ) {
+    var shifted = ceil(log(32768 / most_significant_digit_b) / LN2) 
+    var As_idx = left_shift(A_idx, shifted, temp)
+    var Bs_idx = left_shift(B_idx, shifted, temp)
 
-    var shifted = 16 - data[bmsdidx].toString(2).length
-    A = left_shift(A, shifted)
-    B = left_shift(B, shifted)
+    var pointer_a = pointers[As_idx]
+    var t_a = values[As_idx]
+    var m = t_a.data[t_a.ads[pointer_a]]
 
-    var m = data[ads[A]]
-    var n = data[ads[B]]
+    var pointer_b = pointers[Bs_idx]
+    var t_b = values[Bs_idx]
+    var n = t_b.data[t_b.ads[pointer_b]]
 
     if ( m < n ) {
-      return [zero, right_shift(A, shifted)]
+      return [zero, A_idx]
     }
 
     if ( m == n ) {
-      var c = compare(A, B)
-      if ( c < 0 ) return [zero, right_shift(A, shifted)]
+      var c = compare(As_idx, Bs_idx)
+      if ( c < 0 ) return [zero, A_idx]
       if ( c == 0 ) return [one, zero]
-      return [one, right_shift(subtract(A, B), shifted)]
+      return [one, subtract(A_idx, B_idx, temp)]
     }
 
     if ( m == n + 1 ) {
-      var qr = sub(A, B)
-      return [qr[0], right_shift(qr[1], shifted)]
+      var qr = sub(As_idx, Bs_idx)
+      return [qr[0], right_shift(qr[1], shifted, temp)]
     }
 
     var powerdiff = (m - n - 1) * 16
-    var A_p = right_shift(A, powerdiff)
-    var t3 = sub(A_p, B)
-    var t4 = slowdiv(add(left_shift(t3[1], powerdiff), subtract(A, left_shift(A_p, powerdiff))), B)
-    memory.free(A_p)
-    memory.free(A)
-    memory.free(B)
-    return [add(left_shift(t3[0], powerdiff), t4[0]), right_shift(t4[1], shifted)]
+    var A_p = right_shift(As_idx, powerdiff, temp)
+    var t3 = sub(A_p, Bs_idx, temp)
+    var t4 = slowdiv(add(left_shift(t3[1], powerdiff, temp), subtract(As_idx, left_shift(A_p, powerdiff, temp), temp), temp), Bs_idx)
+
+    return [add(left_shift(t3[0], powerdiff, temp), t4[0], temp), right_shift(t4[1], shifted, temp)]
 
   } else {
 
-    var m = data[ads[A]]
-    var n = data[ads[B]]
+    var pointer_a = pointers[A_idx]
+    var t_a = values[A_idx]
+    var m = t_a.data[t_a.ads[pointer_a]]
+
+    var pointer_b = pointers[B_idx]
+    var t_b = values[B_idx]
+    var n = t_b.data[t_b.ads[pointer_b]]
 
     if ( m < n ) {
-      return [zero, A]
+      return [zero, A_idx]
     }
 
     if ( m == n ) {
-      var c = compare(A, B)
-      if ( c < 0 ) return [zero, A]
+      var c = compare(A_idx, B_idx)
+      if ( c < 0 ) return [zero, A_idx]
       if ( c == 0 ) return [one, zero]
-      return [one, subtract(A, B)]
+      return [one, subtract(A_idx, B_idx, temp)]
     }
 
     if ( m == n + 1 ) {
-      var qr = sub(A, B)
+      // TODO probably we could just return qr here :-S
+      var qr = sub(A_idx, B_idx)
       return [qr[0], qr[1]]
     }
 
     var powerdiff = (m - n - 1) * 16
-    var A_p = right_shift(A, powerdiff)
-    var t3 = sub(A_p, B)
-    var t4 = slowdiv(add(left_shift(t3[1], powerdiff), subtract(A, left_shift(A_p, powerdiff))), B)
-    memory.free(A_p)
-    return [add(left_shift(t3[0], powerdiff), t4[0]), t4[1]]
+    var A_p = right_shift(A_idx, powerdiff, temp)
+
+    var t3 = sub(A_p, B_idx, temp)
+    var t4 = slowdiv(add(left_shift(t3[1], powerdiff, temp), subtract(A_idx, left_shift(A_p, powerdiff, temp), temp), temp), B_idx)
+
+    return [add(left_shift(t3[0], powerdiff, temp), t4[0], temp), t4[1]]
+  }
+}
+
+function divide(dividend, divisor, storage){
+  storage = storage || numbers
+  var mark = temp(2) //get a handle to temp where I can reset the breaking point back to with free()
+  var T = slowdiv(dividend, divisor)
+  var q = T[0], r = T[1]
+
+  var pointer_q = pointers[q]
+  var t_q = values[q]
+  var size_q = t_q.data[t_q.ads[pointer_q]]
+
+  var pointer_r = pointers[r]
+  var t_r = values[r]
+  var size_r = t_r.data[t_r.ads[pointer_r]]
+
+  var Q_idx = storage(size_q)
+  var pointer_Q = pointers[Q_idx]
+  var t_Q = values[Q_idx]
+  data_q = t_q.data
+  didx_q = t_q.ads[pointer_q]
+  data_Q = t_Q.data
+  didx_Q = t_Q.ads[pointer_Q]
+  for ( var l = 0; l < size_q; l++ ) {
+    data_Q[didx_Q + l] = data_q[didx_q + l]
   }
 
+  var R_idx = storage(size_r)
+  var pointer_R = pointers[R_idx]
+  var t_R = values[R_idx]
+  data_r = t_r.data
+  didx_r = t_r.ads[pointer_r]
+  data_R = t_R.data
+  didx_R = t_R.ads[pointer_R]
+  for ( var l = 0; l < size_r; l++ ) {
+    data_R[didx_R + l] = data_r[didx_r + l]
+  }
+  memory.stacks.free(pointers[mark])
+  return [Q_idx, R_idx]
 }
 
-function divide(dividend, divisor){
-  var R = slowdiv(dividend, divisor)
-  return [right_trim(R[0]), right_trim(R[1])]
+function size(index){
+  return [index, memory.stacks.data[memory.stacks.ads[index]]]
 }
 
+function second(tuple){ return tuple[1] }
+
+function max_size(sizes){
+  return max.apply(sizes.map(second))
+}
+
+function get_max_size(){
+  var sizes = map(memory.stacks.ads, size)
+  console.log(sizes)
+  return max_size(sizes)
+}

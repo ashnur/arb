@@ -17,7 +17,7 @@ module.exports = heap
 function init(){
   numbers = memory.numbers(Uint16Array, 2 , false)
   constants = memory.constants(Uint16Array, 4, false)
-  temp = memory.temp(Uint16Array, 1024, false)
+  temp = memory.temp(Uint16Array, 128, false)
   n = 0
   pointers = [] // this can be a typedarray
   values = [] // this no, because has to store the object references

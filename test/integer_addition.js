@@ -33,6 +33,9 @@ var arb_int = as_generator(rand_int('small', 'simple', 'positive'))
 
 var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
 
+var bb = require('bluebird')
+var jp = bb.join
+
 var props = [
   { title : 'identity'
   , fn: identity
@@ -80,8 +83,9 @@ function associativity(a, b, c){
 // print ( 'bc:', bc)
 // print ( 'a+bc:', x)
 // print ( 'ab+c:', y)
-  if ( ! equal(zero, get_new_zero()) ) throw new Error ( 'y u no 0')
-  return equal(x, y)
+  var r = equal(x, y) 
+  if ( ! r ) success = false
+  return r
 }
 
 function commutativity(a, b){
@@ -92,20 +96,21 @@ function commutativity(a, b){
   var ba = add(b, a, temp)
   //print ( 'ba:', ba)
   var r =  equal(ab, ba)
-  if ( ! equal(zero, get_new_zero()) ) throw new Error ( 'y u no 0')
+  if ( ! r ) success = false
   return r
 }
 
 function identity(a){
   var r = equal(add(a, zero, temp), a)
-  var nz = get_new_zero()
-  var tz = memory.values[zero]
-  var tnz = memory.values[nz]
-  if ( ! equal(zero, nz) ) throw new Error ( 'y u no 0')
+  if ( ! r ) success = false
   return r
 }
 
-klara(1000, props)
+var runner = klara.bind(null, 1, props)
+runner()
+
+bb.all(runner())//.then(runner)
+
 
 
 // function make_num(arr){

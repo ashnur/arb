@@ -4,12 +4,13 @@ var liberate = require('liberate')
 var map = liberate(Array.prototype.map)
 
 var ZERO = require('./zero.js')
-var print = require('./print.js')
 var compare = require('./integer_compare_abs.js')
 var memory = require('./memory.js')
 var numbers = memory.numbers
 var pointers = memory.pointers
 var values = memory.values
+
+var print = require('./print.js')
 
 function subtract(A_idx, B_idx, storage){
   storage = storage || numbers

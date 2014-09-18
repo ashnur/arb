@@ -9,7 +9,7 @@ function Memory(type, size, silent){
   if ( size < 1 ) throw new Error('minimum size is 1')
 
   var unallocated = size - 1
-  var brk = 0 // this is the next data index.
+  var brk = 1 // this is the next data index.
   var next = 1 // this is the next address index.
   var heap = {
     data: new type(size)

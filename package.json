@@ -27,6 +27,7 @@
   "license": "BSD-2-Clause",
   "devDependencies": {
     "biginteger": "*",
+    "bluebird": "^2.3.2",
     "claire": "*",
     "liberate": "^1.0.1",
     "tap-spec": "^0.2.1",

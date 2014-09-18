@@ -11,7 +11,7 @@ function Memory(type, size, silent){
 
   var unallocated = size - 1
   var brk = 1 // this is the next data index. zero means it's freed
-  var next = 0 // this is the next address index.
+  var next = 1 // this is the next address index.
 
   var heap = {
     data: new type(size)

@@ -1,27 +1,36 @@
 module.exports = to_int
 var memory = require('./memory.js')
-var data = memory.data
-var ads = memory.ads
-var alloc = memory.alloc
+var values = memory.values
+var pointers = memory.pointers
+var numbers = memory.numbers
+var temp = memory.temp
+
 var floor = Math.floor
-var log10 = Math.log
+var logn = Math.log
+
 var zero = require('./zero.js')
 var one = require('./one.js')
 var print = require('./print.js')
-function to_int(num){
+
+var logn65536 = logn(65536)
+
+function to_int(num, storage){
   if ( num == 0 ) return zero
   if ( num == 1 ) return one
-  var R_size = 1 + floor(log10(num) / log10(65536))
-  var R = alloc(R_size + 2)
-  data[R] = 0 // type integer
+  storage = storage || numbers
 
-  var idx = ads[R]
-  data[idx] = R_size
+  var size_r = 3 + floor(logn(num) / logn65536)
 
-  while ( num > 0 ) {
-    idx = ads[idx]
-    data[idx] = num
-    num = floor(num / 65536)
+  var R_idx = storage(size_r)
+  var pointer_r = pointers[R_idx]
+  var t_r = values[R_idx]
+  var data_r = t_r.data
+  var didx_r = t_r.ads[pointer_r]
+  data_r[didx_r + 1] = 0 // type integer
+  for ( var i = 2; i < size_r; i++ ) {
+    data_r[didx_r + i] = num
+    num = num >>> 16
   }
-  return R
+
+  return R_idx
 }
