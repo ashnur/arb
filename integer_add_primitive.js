@@ -5,7 +5,6 @@ var zero = require('./zero.js')
 var equal = require('./integer_equality.js')
 var to_int = require('./primitive_to_int.js')
 var left_pad = require('./left_pad.js')
-var print = require('./print.js')
 var add = require('./integer_addition.js')
 
 function add_number(A, num, idx){

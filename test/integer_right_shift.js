@@ -13,7 +13,6 @@ var zero = require('../zero.js')
 var to_int = require('../primitive_to_int.js')
 var left_pad = require('../left_pad.js')
 
-var print = require('../print.js')
 
 var rand_int = require('./helpers/rand_int.js')
 var claire = require('claire')
@@ -58,11 +57,8 @@ inputs.forEach(function(z){
 var arr_to_int = require('./helpers/arr_to_int.js')
 
 var I = arr_to_int(z[0])
-print('I', I)
 var V = arr_to_int(z[2])
-print('V', V)
 var R = right_shift(I, z[1])
-print('R', R)
 console.log('equal', equal(R, V))
 })
 

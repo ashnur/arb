@@ -5,15 +5,23 @@ var test = require('tape')
 var claire = require('claire')
 var for_all = claire.forAll
 var check = claire.check
+
 var memory = require('../../memory.js')
-var bb = require('bluebird')
-bb.onPossiblyUnhandledRejection(function(){  })
+var debug = require('../../debug.js')
+var print = require('../../print.js')
+
+//claire.Report.toString = function(){
+//  return ''
+//  //return this.all.map(function(a){
+//  //  console.log(a.labels)
+//  //  console.log(a.arguments)
+//  //})
+//}
 
 function value(size, gen){ return claire.value(size, gen, gen) }
 
 function check_property(count, property){
-  var resolver = bb.pending()
-  test(property.title, function(t){
+  test(property.failed, function(t){
     var checks = for_all.apply(null, property.args)
                       .satisfy(property.fn)
 
@@ -22,34 +30,21 @@ function check_property(count, property){
     }
 
     var results = check(count, checks)
-    results.failed.forEach(function(result){
-      resolver.reject(result)
-      t.fail('')
-    })
 
     if ( results.failed.length == 0 ) {
-      resolver.resolve()
-      t.pass('all test passed')
+      t.pass(' test passed')
+    } else {
+      t.fail('')
     }
 
-    console.log(results+'')// , findlast(memory.stacks.data), findlast(memory.stacks.ads))
-    endsize()
+//    debug.endsize( memory.naives.ads.length,memory.naives.data.length, memory.stacks.ads.length, memory.stacks.data.length)
     property.end()
     t.end()
   })
-  return resolver.promise
 }
 
 function run(count, properties){
   return properties.map(function(prop, idx, properties){
     return check_property(count || 100, prop)
   })
-}
-function endsize(){console.log('end size', memory.naives.data.length, memory.naives.ads.length, memory.stacks.data.length, memory.stacks.ads.length)}
-function findlast(ta){
-  var last = 0
-  for ( var i = 0; i < ta.length; i++ ) {
-    if ( ta[i] > 0 ) last = i
-  }
-  return last
 }

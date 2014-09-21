@@ -10,8 +10,6 @@ var numbers = memory.numbers
 var pointers = memory.pointers
 var values = memory.values
 
-var print = require('./print.js')
-
 function subtract(A_idx, B_idx, storage){
   storage = storage || numbers
 

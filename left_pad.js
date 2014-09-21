@@ -5,8 +5,6 @@ var pointers = memory.pointers
 var numbers = memory.numbers
 var temp = memory.temp
 
-var print = require('./print.js')
-
 function left_pad(A_idx, by, storage){
   storage = storage || temp
 

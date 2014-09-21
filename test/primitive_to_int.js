@@ -12,7 +12,6 @@ var to_int = require('../primitive_to_int.js')
 var klara = require('./claire-helpers/klara.js')
 var analyzer = require('./claire-helpers/analyzer.js')
 var int_analyzer = require('./claire-helpers/analyze_int.js')
-var print = require('../print.js')
 
 function samestring(primitive){
   var bigint = to_int(primitive)

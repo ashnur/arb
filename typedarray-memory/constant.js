@@ -29,14 +29,14 @@ function Memory(type, size, silent){
     // save data_idx in address space and advance next
     var pointer = next++
     if ( pointer == heap.ads.length ) {
-      heap.ads = resize(heap.ads, heap.ads.length * 2, heap.data.length - 1)
+      heap.ads = resize(heap.ads, heap.ads.length * 2, heap.data.length)
     }
     heap.ads[pointer] = data_idx
     return pointer
   }
 
   function extend(needed){
-    heap.data = resize(heap.data, max(size * 2, size - unallocated + needed), heap.data.length - 1 )
+    heap.data = resize(heap.data, max(size * 2, size - unallocated + needed), heap.data.length)
   }
 
   return heap

@@ -31,8 +31,6 @@ var LN2 = Math.LN2
 var base = 65536
 var half_base = base / 2
 
-var print = require('./print.js')
-
 var max = Math.max
 var liberate = require('liberate')
 var map = liberate(Array.prototype.map)
@@ -232,18 +230,4 @@ function divide(dividend, divisor, storage){
   return [Q_idx, R_idx]
 }
 
-function size(index){
-  return [index, memory.stacks.data[memory.stacks.ads[index]]]
-}
 
-function second(tuple){ return tuple[1] }
-
-function max_size(sizes){
-  return max.apply(sizes.map(second))
-}
-
-function get_max_size(){
-  var sizes = map(memory.stacks.ads, size)
-  console.log(sizes)
-  return max_size(sizes)
-}

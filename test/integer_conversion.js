@@ -8,7 +8,6 @@ var parse = require('../parse_base10.js')
 var to_base10 = require('../to_base10.js')
 var rand_int = require('./helpers/rand_int.js')
 var arb_int = as_generator(rand_int.positive)
-var print = require('../print.js')
 
 var chunk_count = rn.bind(null, {min: 0, max: 5, integer:true})
 var chunk_value = rn.bind(null, {min: 0, max: Math.pow(2,31), integer:true})

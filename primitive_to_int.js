@@ -10,7 +10,6 @@ var logn = Math.log
 
 var zero = require('./zero.js')
 var one = require('./one.js')
-var print = require('./print.js')
 
 var logn65536 = logn(65536)
 

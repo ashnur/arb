@@ -6,7 +6,6 @@ var numbers = memory.numbers
 var temp = memory.temp
 var floor = Math.floor
 var zero = require('./zero.js')
-var print = require('./print.js')
 var equal = require('./integer_equality.js')
 
 function right_shift(I_idx, n, storage){

@@ -1,7 +1,8 @@
 module.exports = print
-var noop = function(){}
-var console_log = noop // console.log.bind(console)
 var memory = require('./memory.js')
+
+var noop = function(){}
+var console_log = console.log.bind(console)
 
 function to_poly(name, arr){
   var r = []
@@ -18,25 +19,25 @@ function print(n, idx){
   var data = t.data
   var didx = t.ads[pointer]
 //console_log('p', pointer, didx, Math.max.apply(0, memory.values.map(function(t){ return t.ads.length})))
-// console_log('p', pointer)
-// console_log('adz', t.ads)
-// console_log('didx', didx)
+//console_log('p', pointer)
+//console_log('adz', t.ads)
+//console_log('didx', didx)
 //console_log('print', idx, pointer)
   var v = []
   var a = 0
   var guard = 1000
   var size = data[didx]
   if ( size < 2 ) {
-    console_log('n', n, pointer, didx, data[didx])
+    console_log( n, pointer, didx, data[didx])
     throw new Error('size should never be less than 2')
   }
-  if ( size == 2 ) return console_log(''+n, data[didx]+ ', '+data[didx+1])
-//console_log('size', size)
+  if ( size == 2 ) return console_log(''+n, [])
   for ( var j = 0; j < size; j++ ) {
     //if ( a > 1 ) v.push(heap[pointer]  + ' * 65536^' + ( a - 2 ) )
     v.push(data[didx + j])
     if ( ! (--guard) ) throw new Error('STOP')
   }
-  return console_log('' + n, '[',pointer, didx,']',v.join(' , '))
+  return console_log(n, v.join(', '))
+  //return console_log('[', v.join(' , '), ']')
 }
 

@@ -2,7 +2,6 @@ module.exports = equal
 var memory = require('./memory.js')
 var pointers = memory.pointers
 var values = memory.values
-var print = require('./print.js')
 var max = Math.max
 function equal(a, b){
   if ( a === b ) return true

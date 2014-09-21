@@ -1,5 +1,6 @@
 var memory = require('../memory.js')
 var temp = memory.temp
+var numbers = memory.numbers
 
 var multiply = require('../integer_multiplication.js')
 var rand_int = require('./helpers/rand_int.js')
@@ -10,49 +11,32 @@ var equal = require('../integer_equality.js')
 var one = require('../one.js')
 var liberate = require('liberate')
 var map = liberate(Array.prototype.map)
-var log = console.log.bind(console)
+var console_log = console.log.bind(console)
 var klara = require('./claire-helpers/klara.js')
 var analyzer = require('./claire-helpers/analyzer.js')
+
+var debug = require('../debug.js')
 var print = require('../print.js')
 
-
 function associativity(a, b, c){
-  var ab = multiply(a, b, temp)
-  var bc = multiply(b, c, temp)
-  var ab_c = multiply(ab, c, temp)
-  var a_bc = multiply(a, bc, temp)
+  var ab = multiply(a, b, numbers)
+  var bc = multiply(b, c, numbers)
+  var ab_c = multiply(ab, c, numbers)
+  var a_bc = multiply(a, bc, numbers)
   var r = equal(ab_c, a_bc)
-  if ( ! r ) {
-    print('a', a)
-    print('b', b)
-    print('ab', ab)
-    print('c', c)
-    print('ab_c', ab_c)
-    print('b', b)
-    print('c', c)
-    print('bc', bc)
-    print('a_bc', a_bc)
 
-  }
   return r
 }
 
 function commutativity(a, b){
-  var ab = multiply(a, b, temp)
-  var ba = multiply(b, a, temp)
+  var ab = multiply(a, b, numbers)
+  var ba = multiply(b, a, numbers)
   var r = equal(ab, ba)
-  if ( ! r ) {
-    print('a', a)
-    print('b', b)
-    print('ab', ab)
-    print('ba', ba)
-    console.log(tomul(a, b))
-  }
   return r
 }
 
 function identity(a){
-  return equal(multiply(a, one, temp), a)
+  return equal(multiply(a, one, numbers), a)
 }
 
 var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
@@ -69,7 +53,7 @@ var props = [
   , end: function(){ memory.stacks.free(1) }
   }
 ,
- { title : 'commutativity'
+  { title : 'commutativity'
   , fn: commutativity
   , args: [arb_int, arb_int]
   , analyze: analyzer(bigint_analyzer, bigint_analyzer)
@@ -91,15 +75,25 @@ var props = [
 // var B = num([44613 , 10586])
 // var z = multiply(A, B)
 // var t = multiply(B, A)
-// print('A * B', z )
-// print('B * A', t )
-// console.log('equal', equal(t, z))
 
-var times = 1000
+//function run() { 
+//  return Promise.all(klara(1, props)).then(cont).error(debug.log.bind(null, times))
+//}
+//
+//function cont(result){ 
+//  if ( times-- > 0 ) { 
+//    return run() 
+//  } else { return result }
+//}
+//
+//run().then(function(){
+//  console.log('xxx', arguments)
+//})
+//klara(11, props)
+var times = 100
 while ( times -- > 0 ) {
-  klara(10, props)
+  klara(100, props)
 }
-
 
 function topoly(c, p){ return c + '*' + '(2^16)^' + p }
 function toarr(id){
@@ -118,24 +112,30 @@ function toarr(id){
 function topolynom(a){
   return '(' + toarr(a).map(topoly).join('+') + ')'
 }
-function tomul(a, b){
-  var A = topolynom(a)
-  var B = topolynom(b)
-  return 'convert ' +A + '*' + B + ' to base 65536'
-}
 
-function num(arr){
-  var id = memory.numbers(arr.length + 2)
-  var t = memory.values[id]
-  var p = memory.pointers[id]
-  var data = t.data
-  var didx = t.ads[p]
-  data[didx + 1] = 0
-  for ( var i = 2; i < data[didx]; i++ ) {
-    data[didx + i] = arr[i - 2]
-  }
-  return id
-}
-
-
-
+var arr_to_int = require('./helpers/arr_to_int.js')
+  ;[
+//[[43844, 14859, 57781, 17531, 19009, 9880, 6147, 18038],[52490, 9791, 36721, 53353, 23320]]
+    // 93659137761710733703201699677292178244
+  ].forEach(function(inputs){
+    console_log('- - - - - - - - - s t a r t')
+    var a = arr_to_int(inputs[0])
+    var b = arr_to_int(inputs[1])
+    console_log('a', topolynom(a))
+    //console_log('a id', a, memory.pointers[a], memory.values[a].ads[memory.pointers[a]])
+    //console_log(dumpta(memory.values[a].ads, 50))
+    //console_log(dumpta(memory.values[a].data, 50))
+    console_log('b', topolynom(b))
+    var ab = multiply(a, b, numbers)
+    print('ab', ab)
+    debugger
+    var ba = multiply(b, a, numbers)
+    print('ba', ba)
+    console_log('---')
+    //console_log('a id', a, memory.pointers[a], memory.values[a].ads[memory.pointers[a]])
+    //console_log(dumpta(memory.values[a].ads, 50))
+    //console_log(dumpta(memory.values[a].data, 50))
+    if ( ! equal(ab, ba) ) throw new Error('failed')
+    //memory.stacks.free(1)
+    console_log('- - - - - - - - - e n d')
+  })

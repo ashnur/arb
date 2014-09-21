@@ -10,7 +10,7 @@ function Memory(type, size, silent){
   if ( size < 1 ) throw new Error('minimum size is 1')
 
   var unallocated = size - 1
-  var brk = 1 // this is the next data index. zero means it's freed
+  var brk = 1 // this is the next data index.
   var next = 1 // this is the next address index.
 
   var heap = {
@@ -30,15 +30,16 @@ function Memory(type, size, silent){
     var data_idx = brk
     brk = brk + length
     // save data_idx in address space and advance next
-    var pointer = next
-    next++
+    var pointer = next++
     if ( pointer == heap.ads.length ) {
       heap.ads = resize(heap.ads, heap.ads.length * 2, heap.data.length)
     }
     heap.ads[pointer] = data_idx
     if ( heap.ads[pointer] !== data_idx ) {
+      console.log('data_idx', data_idx, heap.ads[pointer])
+      console.log('data length', heap.data.length)
+      console.log('pointer', pointer)
       throw new Error('overflow')
-      // console.log('overflow', data_idx, heap.ads[pointer])
     }
     return pointer
   }
@@ -59,6 +60,7 @@ function Memory(type, size, silent){
     }
     var update = resize_naive(heap.ads, next, heap.data, nl, brk)
     heap.data = update.data
+    heap.ads = update.ads
     brk = update.brk
     unallocated = heap.data.length - brk - 1
   }

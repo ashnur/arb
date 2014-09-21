@@ -17,7 +17,6 @@ var join = liberate(Array.prototype.join)
 var log = console.log.bind(console)
 var analyzer = require('./claire-helpers/analyzer.js')
 var klara = require('./claire-helpers/klara.js')
-var print = require('../print.js')
 var liberate = require('liberate')
 var map = liberate(Array.prototype.map)
 var forEach = liberate(Array.prototype.forEach)
@@ -28,69 +27,30 @@ function size(idx){
 }
 
 function subtract_sum(n, m, k){
-  var mk = add(m, k, temp)
-  var a = subtract(n, mk, temp)
-  var b = subtract(subtract(n, m, temp), k, temp)
+  var mk = add(m, k)
+  var a = subtract(n, mk)
+  var b = subtract(subtract(n, m), k)
   var r = equal(a, b)
-if ( ! r ) {
- print('n         ', n)
- print('m         ', m)
- print('k         ', k)
- print('m + k     ', mk)
- print('n - (m + k)', a)
- print('n - m - k', b)
-}
   return r
 }
 
 function add_difference(n, m, k){
-  var x = subtract(m, k, temp)
-  var a = add(n, x, temp)
-  var y = add(n, m, temp)
-  var b = subtract(y, k, temp)
+  var x = subtract(m, k)
+  var a = add(n, x)
+  var y = add(n, m)
+  var b = subtract(y, k)
   var r = equal(a, b)
-if ( ! r ) {
- print('n         ', n)
- print('m         ', m)
- print('k         ', k)
- print('m - k     ', x)
- print('n + m - k ', a)
- print('n + m     ', y)
- print('n + m - k ', b)
- console.log('n + (m - k) == (n + m) - k', r)
-}
   return r
 }
 
 function subtract_difference(n, m, k){
-  var m_k = subtract(m, k, temp)
-  var a = subtract(n, m_k, temp)
-  var n_m = subtract(n, m, temp)
-  var b = add(n_m, k, temp)
-  var a_b = add(a, b, temp)
-  var b_a = add(b, a, temp)
+  var m_k = subtract(m, k)
+  var a = subtract(n, m_k)
+  var n_m = subtract(n, m)
+  var b = add(n_m, k)
+  var a_b = add(a, b)
+  var b_a = add(b, a)
   var r = equal(a_b, b_a)
-  if ( !r ) {
-//print('n          ', n)
-//print('m          ', m)
-//print('k          ', k)
-//print('m - k      ', m_k)
-console.log(toop(m, k, '-'))
-console.log(toop(n, m_k, '-'))
-print('n - (m - k)', a)
-console.log('---')
-console.log(toop(n, m, '-'))
-console.log(toop(n_m, k, '+'))
-print('(n - m) + k)', b)
-console.log('---')
-print('a_b', a_b)
-print('b_a', b_a)
-//print('n - m      ', (n_m))
-//print('(n-(m-k))+((n-m)-k)', (a_b))
-//console.log(toop(a, b, '+'))
-//print('((n-m)-k)+(n-(m-k))', (b_a))
-//console.log(toop(b, a, '+'))
-  }
   return r
 }
 
@@ -128,12 +88,13 @@ var props = [
   , end: function(){ memory.stacks.free(1) }
   }
 ]
-
-klara(1000, props)
+var times = 1000
+while(times-- > 0){
+  klara(5, props)
+}
 // var A = num([9,9,9,9,9,9,9,9])
 // var B = num([8,9,9,9,9,9,9,9])
 // var z = subtract(A, B)
-// print('A - B', z )
 //
 // function num(arr){
 //   var id = memory.numbers(arr.length + 2)
@@ -149,31 +110,3 @@ klara(1000, props)
 // }
 //
 //
-function topoly(c, p){ return c + '*' + '(2^16)^' + (Number(p) + 2) }
-function toarr(id){
-  var t = memory.values[id]
-  var p = memory.pointers[id]
-  var data = t.data
-  var didx = t.ads[p]
-  var arr = []
-  var size = data[didx]
-  var idx = didx + 2
-  while ( idx < didx + size ) {
-    arr.push(data[idx++])
-  }
-  return arr
-}
-function fstCharNotZero(str){ return str[0] !== '0' }
-function topolynom(a){
-  var arr = toarr(a)
-  var c = arr.shift()
-  var p1 = arr.shift()
-  p1 = p1 ? p1 : false
-  var rest = arr.length ? arr.map(topoly).filter(fstCharNotZero) : []
-  return '(' + c + ( p1 ?  '+' + p1 + '*(2^16)' : '' ) + (rest.length ? '+' + rest.join('+') : '') + ')'
-}
-function toop(a, b, op){
-  var A = topolynom(a)
-  var B = topolynom(b)
-  return 'convert ' +A + op + B + ' to base 65536'
-}

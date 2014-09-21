@@ -5,8 +5,6 @@ var pointers = memory.pointers
 var numbers = memory.numbers
 var temp = memory.temp
 
-var print = require('./print.js')
-
 var equal = require('./integer_equality.js')
 
 var one = require('./one.js')
@@ -16,7 +14,6 @@ function left_shift(I_idx, n, storage){
   if ( equal(I_idx, zero) ) return zero
     //console.log('left shift ---------->')
   storage = storage || numbers
-//print('I', I_idx)
 //console.log('n', n)
   var words = n >>> 4 // floor(n/16)
   var bits = n & 15 // n % 16
@@ -69,7 +66,6 @@ function left_shift(I_idx, n, storage){
       data_r[didx_r + words + i] = data_i[didx_i + i]
     }
   }
-//print('R', R_idx)
   //console.log('<------- left shift')
   return R_idx
 }

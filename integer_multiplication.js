@@ -9,11 +9,12 @@ var one = require('./one.js')
 var zero = require('./zero.js')
 var equal = require('./integer_equality.js')
 
-var print = require('./print.js')
-
 var max = Math.max
 var liberate = require('liberate')
 var map = liberate(Array.prototype.map)
+var slice = liberate(Array.prototype.slice)
+
+var debug = require('./debug.js')
 
 function multiply(A_idx, B_idx, storage) {
   if ( equal(A_idx, zero) ) return zero
@@ -47,6 +48,7 @@ function multiply(A_idx, B_idx, storage) {
   var didx_t = t_t.ads[pointer_t]
 
   data_t[didx_t + 1] = 0 // type integer
+//  console.log(data_t == data_b, didx_t, didx_b, pointer_a, pointer_b, pointer_t)
   for ( var i = 2; i < data_t[didx_t]; i++ ) data_t[didx_t + i] = 0 // get rid of garbage
 
   var tj = 0
@@ -76,8 +78,8 @@ function multiply(A_idx, B_idx, storage) {
   var size_r = size_a + size_b  - trailing_zeroes - 2
   if ( trailing_zeroes ) data_t[didx_t] = size_r
 
-
   var R_idx = storage(size_r)
+
   var pointer_r = pointers[R_idx]
   var t_r = values[R_idx]
   data_r = t_r.data
@@ -85,24 +87,7 @@ function multiply(A_idx, B_idx, storage) {
   for ( var l = 0; l < size_r; l++ ) {
     data_r[didx_r + l] = data_t[didx_t + l]
   }
-  memory.stacks.free(pointer_r)
+  memory.stacks.free(pointer_t)
 
   return R_idx
-}
-function size(didx, index){
-  return [index, didx, memory.stacks.data[didx]]
-}
-
-function th(n){ return function(tuple){ return tuple[n] } }
-
-function max_size(sizes){
-  var from = sizes.map(th(2))
-  //console.log(from)
-  return max.apply(null, from)
-}
-
-function get_max_size(){
-  var sizes = map(memory.stacks.ads, size)
-  //console.log(memory.stacks.ads.length,memory.stacks.data.length, sizes)
-  return max_size(sizes)
 }

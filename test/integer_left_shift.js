@@ -23,7 +23,6 @@ var to_int = require('../primitive_to_int.js')
 var left_pad = require('../left_pad.js')
 var klara = require('./claire-helpers/klara.js')
 var analyzer = require('./claire-helpers/analyzer.js')
-var print = require('../print.js')
 var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
 var int_analyzer = require('./claire-helpers/analyze_int.js')
 
@@ -41,13 +40,6 @@ function multiplybypowof2(a, b){
   var P = powof2(b)
   var AP = b ? multiply(a, P) : a
   var r = equal(A, AP)
-  if ( ! r ) {
-    print('a', a)
-    console.log('b', b)
-    print('P', P)
-    print('A', A)
-    print('AP', AP)
-  }
   return r
 }
 
@@ -62,9 +54,7 @@ var props = [
 
 // var to_int = require('../primitive_to_int.js')
 // var A = to_int(5*65536+9)
-// print('A ', A )
 // var R = leftshift(A, 13)
-// print('R', R )
  //console.log('equal', equal(t, z))
 
 klara(1000, props)

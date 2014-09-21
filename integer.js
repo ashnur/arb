@@ -13,7 +13,6 @@ var sign = require('./sign.js')
 var parse_base10 = require('./parse_base10.js')
 var to_base10 = require('./to_base10.js')
 var clone = require('./clone.js')
-var print = require('./print.js')
 
 function compare(a, b){
   var na = sign.read(a) ? -1 : 1

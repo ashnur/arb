@@ -26,7 +26,6 @@ var to_int = require('../primitive_to_int.js')
 var klara = require('./claire-helpers/klara.js')
 var left_pad = require('../left_pad.js')
 var analyzer = require('./claire-helpers/analyzer.js')
-var print = require('../print.js')
 
 
 function associativity(a, b, c){

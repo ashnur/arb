@@ -10,6 +10,7 @@ var min = Math.min
 var zero = require('./zero.js')
 var equal = require('./integer_equality.js')
 
+var debug = require('./debug.js')
 
 function add(A_idx, B_idx, storage){
   storage = storage || numbers
@@ -17,8 +18,10 @@ function add(A_idx, B_idx, storage){
   if ( equal(B_idx, zero) ) return A_idx
 
   var pointer_a = pointers[A_idx]
+  var pa = pointer_a
   var t_a = values[A_idx]
   var pointer_b = pointers[B_idx]
+  var pb = pointer_b
   var t_b = values[B_idx]
 
   // this has to be repeated because
@@ -28,6 +31,8 @@ function add(A_idx, B_idx, storage){
 
   if ( size_a >= size_b ) {
     var size_r = size_a + 1
+    //var predump = 'data1: '+ debug.dump(memory.naives.data)
+    //var prel = memory.naives.data.length
     var R_idx = storage(size_r)
 
     var pointer_r = pointers[R_idx]
@@ -62,7 +67,9 @@ function add(A_idx, B_idx, storage){
   } else { // B is longer
 
     var size_r = size_b + 1
-    var R_idx = numbers(size_r)
+    //var predump = 'data2: ' + debug.dump(memory.naives.data)
+    //var prel = memory.naives.data.length
+    var R_idx = storage(size_r)
 
     var pointer_r = pointers[R_idx]
     var t_r = values[R_idx]
@@ -94,12 +101,17 @@ function add(A_idx, B_idx, storage){
     }
   }
 
-
   if ( carry ) {
     data_r[didx_r + i] += carry
   } else {
     data_r[didx_r] = data_r[didx_r] - 1
   }
+
+//  if ( memory.naives.data.length !== prel ) {
+//    console.log(predump)
+//    console.log('data3:', debug.dump(memory.naives.data))
+//  }
+
 
   return R_idx
 }

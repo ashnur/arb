@@ -2,9 +2,11 @@ var rn = require('random-number')
 var rint = rn.generator({integer: true})
 var memory = require('../../memory.js')
 var numbers = memory.numbers
+var temp = memory.temp
 var values = memory.values
 var pointers = memory.pointers
 var sign = require('../../sign.js')
+var print = require('../../print.js')
 
 var rand_bool = rn.bind(null, {integer:true})
 var rand_small_nat = rn.bind(null, {min: 1, max: 5, integer:true})
@@ -13,7 +15,6 @@ var rand_large_nat = rn.bind(null, {min: 1, max:2, integer:true})
 
 var is_arr = Array.isArray
 
-var print = require('../../print.js')
 
 /*
 tiny < 65536 small < 65536^4 large < max size
@@ -25,7 +26,7 @@ function random_bigint(l, s, bigit){
   var minlength = l[0] + 2
   var maxlength = Math.max(minlength, l[1])
   var bigit_count = rint(minlength, maxlength)
-  var idx = numbers(bigit_count)
+  var idx = temp(bigit_count)
   var pointer = pointers[idx]
   var t = values[idx]
   var didx = t.ads[pointer]
@@ -42,6 +43,8 @@ function random_bigint(l, s, bigit){
       t.data[didx + i] = rint(bigit[0], bigit[1]) // set min max on the integer generator
     }
   }
+
+  //print('gen', idx)
 
   return idx
 }
