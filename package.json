@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "node test/integer.js"
+    "test": "node test/integer.js | ./node_modules/.bin/tap-bail | ./node_modules/.bin/tspec"
   },
   "repository": "git@github.com:ashnur/arb.git",
   "keywords": [
@@ -26,16 +26,17 @@
   "author": "ashnur",
   "license": "BSD-2-Clause",
   "devDependencies": {
-    "biginteger": "*",
+    "biginteger": "^1.0.3",
     "bluebird": "^2.3.2",
-    "claire": "*",
+    "claire": "^0.4.1",
     "liberate": "^1.0.1",
     "microtime": "^1.0.1",
-    "tap-spec": "^0.2.1",
-    "tape": "*"
+    "tap-bail": "0.0.0",
+    "tap-spec": "^1.0.0",
+    "tape": "^3.0.0"
   },
   "dependencies": {
-    "liberate": "*",
-    "random-number": "*"
+    "liberate": "^1.0.1",
+    "random-number": "0.0.6"
   }
 }

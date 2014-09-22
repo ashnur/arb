@@ -5,7 +5,6 @@ var numbers = memory.numbers
 var temp = memory.temp
 var values = memory.values
 var pointers = memory.pointers
-var sign = require('../../sign.js')
 var print = require('../../print.js')
 
 var rand_bool = rn.bind(null, {integer:true})
@@ -32,7 +31,9 @@ function random_bigint(l, s, bigit){
   var didx = t.ads[pointer]
 
   t.data[didx + 1] = 0 // type
-  //if ( bigit_count > 0 ) { sign.change(idx, s == null ? rint(0, 1) : s) }
+  if ( bigit_count > 2 ) { 
+    t.data[didx + 1] = s == null ? rint(0, 1) : s
+  }
 
   for ( var i = 2; i < bigit_count; i ++ ) {
     if ( i == bigit_count -1 ) {

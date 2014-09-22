@@ -21,13 +21,14 @@ var print = require('../../print.js')
 function value(size, gen){ return claire.value(size, gen, gen) }
 
 function check_property(count, property){
-  test(property.failed, function(t){
+  test(property.title, function(t){
     var checks = for_all.apply(null, property.args)
                       .satisfy(property.fn)
 
     if ( property.analyze ) {
       checks = checks.classify(property.analyze)
     }
+
 
     var results = check(count, checks)
 

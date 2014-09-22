@@ -78,16 +78,19 @@ function multiply(A_idx, B_idx, storage) {
   var size_r = size_a + size_b  - trailing_zeroes - 2
   if ( trailing_zeroes ) data_t[didx_t] = size_r
 
-  var R_idx = storage(size_r)
+  if ( storage == numbers ) {
+    var R_idx = storage(size_r)
 
-  var pointer_r = pointers[R_idx]
-  var t_r = values[R_idx]
-  data_r = t_r.data
-  didx_r = t_r.ads[pointer_r]
-  for ( var l = 0; l < size_r; l++ ) {
-    data_r[didx_r + l] = data_t[didx_t + l]
+    var pointer_r = pointers[R_idx]
+    var t_r = values[R_idx]
+    data_r = t_r.data
+    didx_r = t_r.ads[pointer_r]
+    for ( var l = 0; l < size_r; l++ ) {
+      data_r[didx_r + l] = data_t[didx_t + l]
+    }
+    memory.stacks.free(pointer_t)
+    return R_idx
   }
-  memory.stacks.free(pointer_t)
 
-  return R_idx
+  return t
 }

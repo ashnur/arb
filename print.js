@@ -31,9 +31,7 @@ function print(n, idx){
     console_log( n, pointer, didx, data[didx])
     throw new Error('size should never be less than 2')
   }
-  if ( size == 2 ) return console_log(''+n, [])
   for ( var j = 0; j < size; j++ ) {
-    //if ( a > 1 ) v.push(heap[pointer]  + ' * 65536^' + ( a - 2 ) )
     v.push(data[didx + j])
     if ( ! (--guard) ) throw new Error('STOP')
   }
