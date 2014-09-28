@@ -30,9 +30,8 @@ function add(A_idx, B_idx, storage){
   var size_b = t_b.data[t_b.ads[pointer_b]]
 
   if ( size_a >= size_b ) {
+
     var size_r = size_a + 1
-    //var predump = 'data1: '+ debug.dump(memory.naives.data)
-    //var prel = memory.naives.data.length
     var R_idx = storage(size_r)
 
     var pointer_r = pointers[R_idx]
@@ -54,14 +53,14 @@ function add(A_idx, B_idx, storage){
 
     for ( var i = 2; i < size_b; i ++ ) {
       partial = data_a[didx_a + i] + data_b[didx_b + i] + carry
-      data_r[didx_r + i] = partial
-      carry = partial > 65535 ? 1 : 0
+      data_r[didx_r + i] = partial & 0x3ffffff
+      carry = partial >>> 26
     }
 
     for ( ; i < size_a; i ++ ) {
       partial = data_a[didx_a + i] + carry
-      data_r[didx_r + i] = partial
-      carry = partial > 65535 ? 1 : 0
+      data_r[didx_r + i] = partial & 0x3ffffff
+      carry = partial >>> 26
     }
 
   } else { // B is longer
@@ -90,14 +89,14 @@ function add(A_idx, B_idx, storage){
 
     for ( var i = 2; i < size_a; i ++ ) {
       partial = data_a[didx_a + i] + data_b[didx_b + i] + carry
-      data_r[didx_r + i] = partial
-      carry = partial > 65535 ? 1 : 0
+      data_r[didx_r + i] = partial & 0x3ffffff
+      carry = partial >>> 26
     }
 
     for ( ; i < size_b; i ++ ) {
       partial = data_b[didx_b + i] + carry
-      data_r[didx_r + i] = partial
-      carry = partial > 65535 ? 1 : 0
+      data_r[didx_r + i] = partial & 0x3ffffff
+      carry = partial >>> 26
     }
   }
 
@@ -106,12 +105,6 @@ function add(A_idx, B_idx, storage){
   } else {
     data_r[didx_r] = data_r[didx_r] - 1
   }
-
-//  if ( memory.naives.data.length !== prel ) {
-//    console.log(predump)
-//    console.log('data3:', debug.dump(memory.naives.data))
-//  }
-
 
   return R_idx
 }

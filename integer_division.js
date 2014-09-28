@@ -11,7 +11,7 @@ var temp = memory.temp
 
 var one = require('./one.js')
 var zero = require('./zero.js')
-var β = require('./65536.js')
+var β = require('./0x4000000.js')
 
 var compare = require('./integer_compare_abs.js')
 var equal = require('./integer_equality.js')
@@ -28,8 +28,8 @@ var floor = Math.floor
 var ceil = Math.ceil
 var log = Math.log
 var LN2 = Math.LN2
-var base = 65536
-var half_base = base / 2
+var base = 0x4000000
+var half_base = 0x2000000
 
 var max = Math.max
 var liberate = require('liberate')
@@ -117,9 +117,9 @@ function slowdiv(A_idx, B_idx){
   var didx_b = t_b.ads[pointer_b]
   var size_b = data_b[didx_b]
   var most_significant_digit_b = data_b[didx_b + size_b - 1]
-  if ( most_significant_digit_b < 32768 ) {
+  if ( most_significant_digit_b < half_base ) {
 
-    var shifted = ceil(log(32768 / most_significant_digit_b) / LN2) 
+    var shifted = ceil(log(half_base / most_significant_digit_b) / LN2) 
     var As_idx = left_shift(A_idx, shifted, temp)
     var Bs_idx = left_shift(B_idx, shifted, temp)
 
@@ -147,7 +147,7 @@ function slowdiv(A_idx, B_idx){
       return [qr[0], right_shift(qr[1], shifted, temp)]
     }
 
-    var powerdiff = (m - n - 1) * 16
+    var powerdiff = (m - n - 1) * 26
     var A_p = right_shift(As_idx, powerdiff, temp)
     var t3 = sub(A_p, Bs_idx, temp)
     var t4 = slowdiv(add(left_shift(t3[1], powerdiff, temp), subtract(As_idx, left_shift(A_p, powerdiff, temp), temp), temp), Bs_idx)
@@ -181,7 +181,7 @@ function slowdiv(A_idx, B_idx){
       return [qr[0], qr[1]]
     }
 
-    var powerdiff = (m - n - 1) * 16
+    var powerdiff = (m - n - 1) * 26
     var A_p = right_shift(A_idx, powerdiff, temp)
 
     var t3 = sub(A_p, B_idx, temp)

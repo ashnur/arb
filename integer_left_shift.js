@@ -15,9 +15,9 @@ function left_shift(I_idx, n, storage){
     //console.log('left shift ---------->')
   storage = storage || numbers
 //console.log('n', n)
-  var words = n >>> 4 // floor(n/16)
-  var bits = n & 15 // n % 16
-  var offset_bits = 16 - bits
+  var words = (n / 26) | 0
+  var bits = n % 26
+  var offset_bits = 26 - bits
 //console.log('words', words)
 //console.log('bits', bits)
 //console.log('offset_bits', offset_bits)
@@ -30,10 +30,7 @@ function left_shift(I_idx, n, storage){
   // extended with
   // and depending on the most significant bigit's size 1 or 0 more
   var msdi = t_i.data[t_i.ads[pointer_i] + size_i - 1]
-  //console.log('leading digit', msdi)
-  var bits_word = ((t_i.data[t_i.ads[pointer_i] + size_i - 1] << bits) >= 65536 ? 1 : 0)
-  //console.log('Ss', msdi << bits )
-  //console.log('bw', bits_word)
+  var bits_word = ((msdi * Math.pow(2,bits)) > 0x3ffffff ? 1 : 0)
   var R_idx = storage(size_i + words + bits_word)
   var pointer_r = pointers[R_idx]
   var t_r = values[R_idx]
@@ -41,7 +38,7 @@ function left_shift(I_idx, n, storage){
   var didx_r = t_r.ads[pointer_r]
   data_r[didx_r + 1] = 0 // type integer
 
-  // data index has to be read AFTER the allocation because 
+  // data index has to be cached AFTER the allocation because 
   // the allocation might change the indeces received
   var data_i = t_i.data
   var didx_i = t_i.ads[pointer_i]
@@ -55,7 +52,7 @@ function left_shift(I_idx, n, storage){
 
     var carry = 0
     for ( var j = 2; j < size_i; j++ ) {
-      data_r[didx_r + words + j] = carry + (data_i[didx_i + j] << bits)
+      data_r[didx_r + words + j] = (carry + (data_i[didx_i + j] << bits)) & 0x3ffffff
       carry = data_i[didx_i + j] >>> offset_bits
     }
     data_r[didx_r + words + j] = carry

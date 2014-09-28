@@ -16,6 +16,5 @@ function arr_to_int(arr, all){
   for( var i = 2, j = all ? 2 : 0; j < arr.length; i++, j++ ) {
     data_i[didx_i + i] = arr[j]
   }
-  print('i', I_idx)
   return I_idx
 }

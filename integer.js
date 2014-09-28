@@ -113,9 +113,9 @@ function multiplication(a, b){
 
 function division(a, b){
   if ( equal(b, one) ) return [a, zero]
+  if ( equal(b, zero) ) throw new Error('can\'t divide with zero')
   if ( equal(a, zero) ) return [zero, zero]
   if ( compare_abs(a, b) == -1 ) return [zero, a]
-  if ( equal(b, zero) ) throw new Error('can\'t divide with zero')
   var r = divide(a, b)
 
   var t_a = values[a]

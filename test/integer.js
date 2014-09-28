@@ -102,14 +102,19 @@ function associativity_mul(a, b, c){
   var r = equal(ab_c, a_bc)
   if ( ! r ) {
     print('a', a)
+    console.log('a', topolynom(a))
     print('b', b)
+    console.log('b', topolynom(b))
     print('ab', ab)
+    console.log('ab', topolynom(ab))
     print('c', c)
+    console.log('c', topolynom(c))
     print('ab_c', ab_c)
-    print('b', b)
-    print('c', c)
+    console.log('ab_c', topolynom(ab_c))
     print('bc', bc)
+    console.log('bc', topolynom(bc))
     print('a_bc', a_bc)
+    console.log('a_bc', topolynom(a_bc))
 
   }
   return r
@@ -238,7 +243,26 @@ var props = [
   , end: function(){  }
   }
 ]
-var times = 100
+
+function topoly(c, p){ return c + '*' + '(2^26)^' + p }
+function toarr(id){
+  var t = memory.values[id]
+  var p = memory.pointers[id]
+  var data = t.data
+  var didx = t.ads[p]
+  var arr = []
+  var size = data[didx]
+  var idx = didx + 2
+  while ( idx < didx + size ) {
+    arr.push(data[idx++])
+  }
+  return arr
+}
+function topolynom(a){
+  return '(' + toarr(a).map(topoly).join('+') + ')'
+}
+
+var times = 10
 while (times -- > 0) {
-  klara(10000, props)
+  klara(10, props)
 }

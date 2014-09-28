@@ -121,7 +121,7 @@ function topolynom(a){
 function toop(a, b, op){
   var A = topolynom(a)
   var B = topolynom(b)
-  return 'convert ' +A + op + B + ' to base 65536'
+  return 'convert ' +A + op + B + ' to base 67108864'
 }
 function findlast(ta){
   var last = 0
@@ -151,7 +151,7 @@ function topolynom(a){
 function tomul(a, b){
   var A = topolynom(a)
   var B = topolynom(b)
-  return 'convert ' +A + '*' + B + ' to base 65536'
+  return 'convert ' +A + '*' + B + ' to base 67108864'
 }
 
 function num(arr){

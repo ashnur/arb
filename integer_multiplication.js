@@ -14,8 +14,6 @@ var liberate = require('liberate')
 var map = liberate(Array.prototype.map)
 var slice = liberate(Array.prototype.slice)
 
-var debug = require('./debug.js')
-
 function multiply(A_idx, B_idx, storage) {
   if ( equal(A_idx, zero) ) return zero
   if ( equal(B_idx, zero) ) return zero
@@ -32,7 +30,8 @@ function multiply(A_idx, B_idx, storage) {
   var size_a = t_a.data[t_a.ads[pointer_a]]
   var size_b = t_b.data[t_b.ads[pointer_b]]
 
-  var t = temp(size_a + size_b - 2) // header(2 blocks) is in both, so has to be removed
+  var size_t = size_a + size_b - 2
+  var t = temp(size_t) // header(2 blocks) is in both, so has to be removed
   // console.log('----------------------------------', get_max_size())
 
   var data_a = t_a.data
@@ -49,7 +48,7 @@ function multiply(A_idx, B_idx, storage) {
 
   data_t[didx_t + 1] = 0 // type integer
 //  console.log(data_t == data_b, didx_t, didx_b, pointer_a, pointer_b, pointer_t)
-  for ( var i = 2; i < data_t[didx_t]; i++ ) data_t[didx_t + i] = 0 // get rid of garbage
+  for ( var i = 2; i < size_t; i++ ) data_t[didx_t + i] = 0 // get rid of garbage
 
   var tj = 0
   var c = 0
@@ -61,12 +60,11 @@ function multiply(A_idx, B_idx, storage) {
     for ( var j = 2; j < size_b; j++ ) {
       c = n
       tj = a * data_b[didx_b + j] + data_t[didx_t + i + j - 2] + c
-      data_t[didx_t + i + j - 2] = tj & 65535
-      n = tj >>> 16
+      data_t[didx_t + i + j - 2] = tj & 0x3ffffff
+      n = (tj / 0x4000000) | 0
     }
     data_t[didx_t + i + size_b - 2] = n
   }
-
 
   var trailing_zeroes = 0
   var k = size_a + size_b - 3 + didx_t

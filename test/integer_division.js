@@ -28,6 +28,7 @@ var divisor = as_generator(rand_int.static_generator([1,4], 'complex', 'positive
 var klara = require('./claire-helpers/klara.js')
 var analyzer = require('./claire-helpers/analyzer.js')
 
+var print = require('../print.js')
 var to_int = require('../primitive_to_int.js')
 
 var max = Math.max
@@ -68,6 +69,7 @@ var props = [
 var arr_to_int = require('./helpers/arr_to_int.js')
 
  ;[
+   [[0 , 3 ], [1]],
    [[0 , 2 ], [1]],
    [[0, 0, 1],[1]],
    [[3],[2]],
@@ -95,13 +97,17 @@ var arr_to_int = require('./helpers/arr_to_int.js')
   ].forEach(function(inputs){
     console_log('- - - - - - - - - s t a r t')
     var a = arr_to_int(inputs[0])
+    print('a', a)
     var b = arr_to_int(inputs[1])
+    print('b', b)
 //    console_log('a', topolynom(a))
 //    console_log('a id', a, memory.pointers[a], memory.values[a].ads[memory.pointers[a]])
 //    console_log(dumpta(memory.values[a].ads, 50))
 //    console_log(dumpta(memory.values[a].data, 50))
 //    console_log('b', topolynom(b))
     var d = divide(a, b)
+    print('q', d[0])
+    print('r', d[1])
 //    console_log('---')
 //    console_log('a id', a, memory.pointers[a], memory.values[a].ads[memory.pointers[a]])
 //    console_log(dumpta(memory.values[a].ads, 50))

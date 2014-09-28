@@ -6,7 +6,7 @@ var multiply = require('../integer_multiplication.js')
 var rand_int = require('./helpers/rand_int.js')
 var claire = require('claire')
 var as_generator = claire.asGenerator
-var arb_int = as_generator(rand_int.static_generator([1,20], 'complex', 'positive'))
+var arb_int = as_generator(rand_int.static_generator([1,2], 'simple', 'positive'))
 var equal = require('../integer_equality.js')
 var one = require('../one.js')
 var liberate = require('liberate')
@@ -68,34 +68,20 @@ var props = [
   }
 ]
 
-// var to_int = require('../primitive_to_int.js')
-// var A = to_int(65541)
-// var B = to_int(393217)
-// var A = num([16688])
-// var B = num([44613 , 10586])
-// var z = multiply(A, B)
-// var t = multiply(B, A)
-
-//function run() { 
-//  return Promise.all(klara(1, props)).then(cont).error(debug.log.bind(null, times))
-//}
-//
-//function cont(result){ 
-//  if ( times-- > 0 ) { 
-//    return run() 
-//  } else { return result }
-//}
-//
-//run().then(function(){
-//  console.log('xxx', arguments)
-//})
-//klara(11, props)
 var times = 100
 while ( times -- > 0 ) {
   klara(100, props)
 }
 
-function topoly(c, p){ return c + '*' + '(2^16)^' + p }
+function topoly(c, p){ 
+  return c == 0 ? ''
+       : c == 1 ? p == 0 ? '1'
+                : p == 1 ? '(2^26)'
+                :          '(2^26)^'+p
+       : p == 0 ? c
+       : p == 1 ? c + '*(2^26)'
+       : c + '*(2^26)^' + p
+}
 function toarr(id){
   var t = memory.values[id]
   var p = memory.pointers[id]
@@ -109,33 +95,35 @@ function toarr(id){
   }
   return arr
 }
+function lengthnot0(s){ return s.length != 0 }
 function topolynom(a){
-  return '(' + toarr(a).map(topoly).join('+') + ')'
+  return '(' + toarr(a).map(topoly).filter(lengthnot0).join('+') + ')'
 }
 
 var arr_to_int = require('./helpers/arr_to_int.js')
   ;[
-//[[43844, 14859, 57781, 17531, 19009, 9880, 6147, 18038],[52490, 9791, 36721, 53353, 23320]]
-    // 93659137761710733703201699677292178244
+//    [[0, 1, 1],[1, 0x1000000],[0, 0x3fffffd]]
+//    [[53158618, 53175157, 31483026],[30417118, 54687773],[17032450, 59213669]]
   ].forEach(function(inputs){
-    console_log('- - - - - - - - - s t a r t')
     var a = arr_to_int(inputs[0])
     var b = arr_to_int(inputs[1])
+    var c = arr_to_int(inputs[2])
     console_log('a', topolynom(a))
-    //console_log('a id', a, memory.pointers[a], memory.values[a].ads[memory.pointers[a]])
+    console_log('b', topolynom(b))
+    console_log('c', topolynom(c))
     //console_log(dumpta(memory.values[a].ads, 50))
     //console_log(dumpta(memory.values[a].data, 50))
-    console_log('b', topolynom(b))
     var ab = multiply(a, b, numbers)
     print('ab', ab)
-    debugger
-    var ba = multiply(b, a, numbers)
-    print('ba', ba)
+    console_log('ab', topolynom(ab))
+    var bc = multiply(b, c, numbers)
+    print('bc', bc)
+    console_log('bc', topolynom(bc))
+    
+    var ab_c = multiply(ab, c, numbers)
+    var a_bc = multiply(a, bc, numbers)
+    console_log('ab_c', topolynom(ab_c))
+    console_log('a_bc', topolynom(a_bc))
     console_log('---')
-    //console_log('a id', a, memory.pointers[a], memory.values[a].ads[memory.pointers[a]])
-    //console_log(dumpta(memory.values[a].ads, 50))
-    //console_log(dumpta(memory.values[a].data, 50))
-    if ( ! equal(ab, ba) ) throw new Error('failed')
-    //memory.stacks.free(1)
-    console_log('- - - - - - - - - e n d')
+    if ( ! equal(ab_c, a_bc) ) throw new Error('failed')
   })

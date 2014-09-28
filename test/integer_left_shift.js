@@ -26,10 +26,12 @@ var analyzer = require('./claire-helpers/analyzer.js')
 var bigint_analyzer = require('./claire-helpers/analyze_bigint.js')
 var int_analyzer = require('./claire-helpers/analyze_int.js')
 
+var print = require('../print.js')
+
 function powof2(p){
   if ( p === 0 ) return zero
-  var words = Math.floor(p / 16)
-  p = Math.pow(2, p - words * 16)
+  var words = Math.floor(p / 26)
+  p = Math.pow(2, p - words * 26)
   var P = to_int(p, temp)
   var PP = left_pad(P, words, temp)
   return PP
@@ -38,7 +40,9 @@ function powof2(p){
 function multiplybypowof2(a, b){
   var A = leftshift(a, b)
   var P = powof2(b)
+
   var AP = b ? multiply(a, P) : a
+
   var r = equal(A, AP)
   return r
 }
@@ -48,13 +52,8 @@ var props = [
   , fn: multiplybypowof2
   , args: [arb_int, arb_primitive]
   , analyze: analyzer(bigint_analyzer, int_analyzer)
-  , end: memory.reset
+  , end: function(){memory.stacks.free()}
   }
 ]
-
-// var to_int = require('../primitive_to_int.js')
-// var A = to_int(5*65536+9)
-// var R = leftshift(A, 13)
- //console.log('equal', equal(t, z))
 
 klara(1000, props)

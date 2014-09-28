@@ -13,6 +13,8 @@ var zero = require('../zero.js')
 var to_int = require('../primitive_to_int.js')
 var left_pad = require('../left_pad.js')
 
+var print = require('../print.js')
+
 
 var rand_int = require('./helpers/rand_int.js')
 var claire = require('claire')
@@ -30,17 +32,17 @@ var int_analyzer = require('./claire-helpers/analyze_int.js')
 function powof2(p){
   var R = zero
   if ( p === 0 ) return R
-  var words = Math.floor(p / 16)
-  p = p - words * 16
+  var words = Math.floor(p / 26)
+  p = p - words * 26
   return left_pad(to_int(Math.pow(2, p)), words)
 }
 
 
 var inputs = [
-  [[12486, 33335, 61143, 31631, 104],[21], [48145, 32630, 17372, 3]]
-, [[0,1],[1], [32768]]
-, [[0,1024],[15], [2048]]
-, [[0,0,1],[15], [0,2]]
+  [[0,0,1],[25], [0,2]]
+, [[0,1],[1], [33554432]]
+, [[0,1024],[25], [2048]]
+, [[37171398,66827744,427960],[21], [58113041, 13694751]]
 ]
 
 // var props = [
@@ -53,13 +55,21 @@ var inputs = [
 // ]
 
 inputs.forEach(function(z){
+console.log('------------------')
+  var arr_to_int = require('./helpers/arr_to_int.js')
 
-var arr_to_int = require('./helpers/arr_to_int.js')
+  var I = arr_to_int(z[0])
+  var V = arr_to_int(z[2])
+  var R = right_shift(I, z[1])
+  var r = equal(R, V)
+  print('V', V)
+  print('I', I)
+  console.log('->', z[1])
+  print('R', R)
+  if ( !r ) {
 
-var I = arr_to_int(z[0])
-var V = arr_to_int(z[2])
-var R = right_shift(I, z[1])
-console.log('equal', equal(R, V))
+    throw new Error('failed')
+  }
 })
 
 // klara(1000, props)

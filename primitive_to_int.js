@@ -11,14 +11,14 @@ var logn = Math.log
 var zero = require('./zero.js')
 var one = require('./one.js')
 
-var logn65536 = logn(65536)
+var logn2_26 = logn(0x4000000)
 
 function to_int(num, storage){
   if ( num == 0 ) return zero
   if ( num == 1 ) return one
   storage = storage || numbers
 
-  var size_r = 3 + floor(logn(num) / logn65536)
+  var size_r = 3 + floor(logn(num) / logn2_26)
 
   var R_idx = storage(size_r)
   var pointer_r = pointers[R_idx]
@@ -28,7 +28,7 @@ function to_int(num, storage){
   data_r[didx_r + 1] = 0 // type integer
   for ( var i = 2; i < size_r; i++ ) {
     data_r[didx_r + i] = num
-    num = num >>> 16
+    num = num >>> 26
   }
 
   return R_idx

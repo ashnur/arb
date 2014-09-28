@@ -15,12 +15,6 @@ var rand_large_nat = rn.bind(null, {min: 1, max:2, integer:true})
 var is_arr = Array.isArray
 
 
-/*
-tiny < 65536 small < 65536^4 large < max size
-simple : bigits < 10, complex: any bigits
-positive, integer
-*/
-
 function random_bigint(l, s, bigit){
   var minlength = l[0] + 2
   var maxlength = Math.max(minlength, l[1])
@@ -57,7 +51,7 @@ function bigint_generator(size, complexity, sign){
 
   var bigit  = complexity == 'simple' ? [0, 9]
              : is_arr(complexity)     ? complexity
-             :                          [0, 65535]
+             :                          [0, 0x3ffffff]
 
   var l      = size == 'tiny'         ? [0, 1]
              : size == 'small'        ? [1, 5]

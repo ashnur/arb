@@ -56,17 +56,17 @@ function subtract(A_idx, B_idx, storage){
   for ( var i = 2; i < size_b; i ++ ) {
     r = data_a[didx_a + i] - data_b[didx_b + i] + carry
     if ( r < 0 ) {
-      data_r[didx_r + i] = r + 65536
+      r += 0x4000000
       carry = -1
     } else {
-      data_r[didx_r + i] = r
       carry = 0
     }
+    data_r[didx_r + i] = r
   }
   for ( ; i < size_a; i ++ ) {
     r = data_a[didx_a + i] + carry
     if ( r < 0 ) {
-      data_r[didx_r + i] = r + 65536
+      data_r[didx_r + i] = r + 0x4000000
       carry = -1
     } else {
       data_r[didx_r + i] = r

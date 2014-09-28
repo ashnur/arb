@@ -4,15 +4,6 @@ var memory = require('./memory.js')
 var noop = function(){}
 var console_log = console.log.bind(console)
 
-function to_poly(name, arr){
-  var r = []
-  for ( var i = 2; i < heap[arr + 1]; i++ ) {
-    r.push(heap[arr + i]  + ' * 65536^' +(i-2))
-  }
-  if ( ! r.length) r.push(0)
-  log(name, r.join(' + '))
-}
-
 function print(n, idx){
   var pointer = memory.pointers[idx]
   var t = memory.values[idx]
