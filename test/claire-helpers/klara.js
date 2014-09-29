@@ -8,7 +8,6 @@ var check = claire.check
 
 var memory = require('../../memory.js')
 var debug = require('../../debug.js')
-var print = require('../../print.js')
 
 //claire.Report.toString = function(){
 //  return ''

@@ -5,7 +5,6 @@ var numbers = memory.numbers
 var temp = memory.temp
 var values = memory.values
 var pointers = memory.pointers
-var print = require('../../print.js')
 
 var rand_bool = rn.bind(null, {integer:true})
 var rand_small_nat = rn.bind(null, {min: 1, max: 5, integer:true})
@@ -39,7 +38,6 @@ function random_bigint(l, s, bigit){
     }
   }
 
-  //print('gen', idx)
 
   return idx
 }

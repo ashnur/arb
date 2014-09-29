@@ -1,25 +1,28 @@
 var memory = require('../memory.js')
-var equal = require('../integer_equality.js')
-var rand_int = require('./helpers/rand_int.js')
+
 var integer = require('../integer.js')
+
 var add = integer.add
 var subtract = integer.subtract
 var multiply = integer.multiply
 var divide = integer.divide
-var compare = integer.compare
+var compare_abs = integer.compare_abs
+var equal = integer.equal
+
 var claire = require('claire')
 var as_generator = claire.asGenerator
-var Integer = as_generator(rand_int.static_generator([0,5], 'complex', 'negative'))
+var rand_int = require('./helpers/rand_int.js')
+var Integer = as_generator(rand_int.static_generator([0,20], 'complex', 'negative'))
 var liberate = require('liberate')
 var join = liberate(Array.prototype.join)
 var log = console.log.bind(console)
 var analyzer = require('./claire-helpers/analyzer.js')
 var klara = require('./claire-helpers/klara.js')
 
-var zero = require('../zero.js')
-var one = require('../one.js')
+var zero = integer.zero
+var one = integer.one
 
-var print = require('../print.js')
+var print = integer.print
 
 function subtract_sum(n, m, k){
   var n_m = subtract(n, m)
@@ -87,11 +90,23 @@ function commutativity_add(a, b){
 }
 
 function identity(a){
-  return (equal(add(a, zero), a)
-        && equal(add(zero, a), a)
-        && equal(subtract(a, zero), a)
-        && equal(multiply(a, one), a)
-        )
+  if ( !equal(add(a, zero), a) ) {
+    console.log(11)
+    throw new Error('a + 0')
+  }
+  if ( !equal(add(zero, a), a) ) {
+    console.log(2)
+    throw new Error('0 + a')
+  }
+  if ( !equal(subtract(a, zero), a) ) {
+    console.log(3)
+    throw new Error('a - 0')
+  }
+  if ( !equal(multiply(a, one), a) ) {
+    console.log(4)
+    throw new Error('0 - a')
+  }
+  return true
 }
 
 function associativity_mul(a, b, c){
@@ -134,11 +149,11 @@ function commutativity_mul(a, b){
 }
 
 function back_substitution_div(dividend, divisor){
-  if ( ! equal(divisor, zero) ) {
+  if ( !equal(divisor, zero) ) {
     var result = divide(dividend, divisor)
     var quotient = result[0]
     var remainder = result[1]
-    if ( compare(dividend, divisor) >= 0 ) {
+    if ( compare_abs(dividend, divisor) >= 0 ) {
       var r1 = multiply(quotient, divisor)
       var r2 = add(r1, remainder)
       var z = equal(dividend, r2)
@@ -152,6 +167,7 @@ function back_substitution_div(dividend, divisor){
       }
       return z
     } else {
+      
       return equal(quotient, zero) && equal(dividend, remainder)
     }
   } else {
@@ -236,7 +252,8 @@ var props = [
   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
   , end: function(){  }
   }
-, { title : 'division back substitution'
+, 
+{ title : 'division back substitution'
   , fn: back_substitution_div
   , args: [Integer, Integer]
   , analyze: analyzer(bigint_analyzer, bigint_analyzer)
@@ -264,5 +281,29 @@ function topolynom(a){
 
 var times = 10
 while (times -- > 0) {
-  klara(10, props)
+  klara(1000, props)
 }
+
+var arr_to_int = integer.arr_to_int
+//// var a = arr_to_int(, true)
+//// var b = arr_to_int(, true)
+
+;[
+  [[3, 1, 35107450], [3, 1, 3239272]],
+].forEach(function(args){
+  var a = arr_to_int(args[0], true)
+  var b = arr_to_int(args[1], true)
+debugger
+  var T = divide(a, b)
+  var q = T[0]
+  var r = T[1]
+  var s = add(multiply(q, b), r)
+  if ( ! equal (s, a) ) { 
+    print('a', a)
+    print('b', b)
+    print('q', q)
+    print('r', r)
+    print('s', s)
+    throw new Error('failed')
+  }
+})

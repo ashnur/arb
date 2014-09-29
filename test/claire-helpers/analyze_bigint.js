@@ -1,4 +1,3 @@
-var sign = require('../../sign.js')
 var memory = require('../../memory.js')
 var pointers = memory.pointers
 var values = memory.values
@@ -28,8 +27,9 @@ function describeComplexity(idx){
 
 var complexity = { name: 'complexity' , describe: describeComplexity }
 
-function describeSign(v){
-  var s = sign.read(v)
+function describeSign(idx){
+  var t = values[idx]
+  var sign = t.data[t.ads[pointers[idx]]+1] & 1
   return [Number(s), s ? 'integer' : 'positive']
 }
 

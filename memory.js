@@ -1,8 +1,8 @@
 var memory = require('./typedarray-memory/index.js')
 
-var numbers = memory.numbers(Uint32Array, 32768 , false)
+var numbers = memory.numbers(Uint32Array, Math.pow(2,12) , false)
 var constants = memory.constants(Uint32Array, 8, false)
-var temp = memory.temp(Uint32Array, 32768, false)
+var temp = memory.temp(Uint32Array, Math.pow(2,12), false)
 var n = 0
 var pointers = [] // this can be a typedarray
 var values = [] // this no, because has to store the object references

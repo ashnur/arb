@@ -1,9 +1,0 @@
-var memory = require('./memory.js')
-var idx = memory.constants(4)
-var t = memory.values[idx]
-var pointer = memory.pointers[idx]
-var didx = t.ads[pointer]
-t.data[didx + 1] = 0 // type integer
-t.data[didx + 2] = 0 // value
-t.data[didx + 3] = 1 // value
-module.exports = idx

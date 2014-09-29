@@ -3,7 +3,6 @@ void function(){
   var map = liberate(Array.prototype.map)
   var slice = liberate(Array.prototype.slice)
   var each = liberate(Array.prototype.forEach)
-  var sign = require('../../sign.js')
   var log = console.log.bind(console)
 
 
