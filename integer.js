@@ -1,15 +1,10 @@
-var noop = function(){}
+/*jshint asi:true, laxcomma:false*/
 var console_log = console.log.bind(console)
 
-var memory = require('./memory.js')
-var values = memory.values
-var pointers = memory.pointers
-var temp = memory.temp
-var numbers = memory.numbers
-var constants = memory.constants
-var stacks = memory.stacks
-var naives = memory.naives
-
+var log = Math.log
+var pow = Math.pow
+var ceil = Math.ceil
+var max = Math.max
 var logn = Math.log
 var floor = Math.floor
 var ceil = Math.ceil
@@ -17,6 +12,233 @@ var LN2 = Math.LN2
 var logn2_26 = logn(0x4000000)
 var base      = 0x4000000
 var half_base = 0x2000000
+
+function Address(max, length){
+  if ( (max) <= 256 ) {
+    return new Uint8Array(length)
+  } else if ( (max) < Math.pow(2, 16) ) {
+    return new Uint16Array(length)
+  } else if ( (max) < Math.pow(2, 25) ) {
+    return new Uint32Array(length)
+  } else if ( max >= Math.pow(2, 25) ) {
+    // https://github.com/joyent/node/blob/857975d5e7e0d7bf38577db0478d9e5ede79922e/src/smalloc.h#L43
+    throw new Error('Maximum size is 2^25 - 1. You gave: '+ max)
+  }
+}
+
+function resize(arr, l, maxvalue){
+  
+  var length = pow(2, ceil(log(l) / LN2))
+  var r = Address(maxvalue, length)
+  r.set(arr)
+  return r
+}
+
+function resize_naive(ads, next, data, l){
+  var new_ads = new ads.constructor(ads.length)
+  // find next power of 2 larger or equal to length
+  var length = pow(2, ceil(log(l) / LN2))
+  var r = new data.constructor(length)
+  var ri = 1
+  for ( var i = 1; i < next; i++ ) {
+    var data_idx = ads[i]
+    if ( data_idx !== 0 ) {
+      var size = data[data_idx]
+      new_ads[i] = ri
+      for ( var j = 0; j < size; j++ ) {
+        r[ri] = data[data_idx + j]
+        ri++
+      }
+    }
+  }
+  return { data: r, brk: ri, ads: new_ads }
+}
+
+function Naive(type, size, silent){
+  silent = silent || true
+  if ( size < 1 ) throw new Error('minimum size is 1')
+
+  var unallocated = size - 1
+  var brk = 1 // this is the next data index.
+  var next = 1 // this is the next address index.
+
+  var heap = {
+    data: new type(size)
+  , ads: Address(size, size)
+  , alloc: alloc
+  , free: free
+  }
+
+  function alloc(length){
+    // there is no check for it but length has to be larger than 0
+    if ( length > unallocated ) {
+      extend(length)
+    }
+    unallocated -= length
+    // save data index to data_idx and advance the break point with length
+    var data_idx = brk
+    brk = brk + length
+    // save data_idx in address space and advance next
+    var pointer = next++
+    if ( pointer === heap.ads.length ) {
+      heap.ads = resize(heap.ads, heap.ads.length * 2, heap.data.length)
+    }
+    heap.ads[pointer] = data_idx
+    if ( heap.ads[pointer] !== data_idx ) {
+      console.log('data_idx', data_idx, heap.ads[pointer])
+      console.log('data length', heap.data.length)
+      console.log('pointer', pointer)
+      throw new Error('overflow')
+    }
+    return pointer
+  }
+
+  function free(pointer){
+    if ( pointer === 0 ) {
+      if ( silent ) return
+      throw new Error('trying to free pointer: ' + pointer )
+    }
+    heap.ads[pointer] = 0
+  }
+
+  function extend(needed){
+    var cl  = heap.data.length
+    var nl = max(cl * 2, cl - unallocated + needed)
+    if ( nl >= Math.pow(2, heap.ads.BYTES_PER_ELEMENT) ) {
+      heap.ads = resize(heap.ads, heap.ads.length * 2, nl)
+    }
+    var update = resize_naive(heap.ads, next, heap.data, nl)
+    heap.data = update.data
+    heap.ads = update.ads
+    brk = update.brk
+    unallocated = heap.data.length - brk - 1
+  }
+
+  return heap
+
+}
+
+function Constant(type, size, silent){
+  silent = silent || true
+  if ( size < 1 ) throw new Error('minimum size is 1')
+
+  var unallocated = size - 1
+  var brk = 1 // this is the next data index.
+  var next = 1 // this is the next address index.
+  var heap = {
+    data: new type(size)
+  , ads: Address(size, size)
+  , alloc: alloc
+  }
+
+  function alloc(length){
+    // there is no check for it but length has to be larger than 0
+    if ( length > unallocated ) {
+      extend(length)
+    }
+    unallocated -= length
+    // save data index to data_idx and advance the break point with length
+    var data_idx = brk
+    brk = brk + length
+    // save data_idx in address space and advance next
+    var pointer = next++
+    if ( pointer === heap.ads.length ) {
+      heap.ads = resize(heap.ads, heap.ads.length * 2, heap.data.length)
+    }
+    heap.ads[pointer] = data_idx
+    return pointer
+  }
+
+  function extend(needed){
+    heap.data = resize(heap.data, max(size * 2, size - unallocated + needed), heap.data.length)
+  }
+
+  return heap
+}
+
+function Stack(type, size, silent){
+  silent = silent || true
+  if ( size < 1 ) throw new Error('minimum size is 1')
+
+  var unallocated = size - 1
+  var brk = 1 // this is the next data index.
+  var next = 1 // this is the next address index.
+  var heap = {
+    data: new type(size)
+  , ads: Address(size, size)
+  , alloc: alloc
+  , free: free
+  , brk: function(){return [brk, next]}
+  }
+
+  function alloc(length){
+    // there is no check for it but length has to be larger than 0
+    if ( length > unallocated ) {
+      extend(length)
+    }
+    unallocated -= length
+    // save data index to data_idx and advance the break point with length
+    var data_idx = brk
+    brk = brk + length
+    // save data_idx in address space and advance next
+    var pointer = next++
+    if ( pointer === heap.ads.length ) {
+      heap.ads = resize(heap.ads, heap.ads.length * 2, heap.data.length)
+    }
+    heap.ads[pointer] = data_idx
+    return pointer
+  }
+
+  function free(pointer){
+    if ( pointer === 0 ) {
+      if ( silent ) return
+      throw new Error('trying to free pointer: ' + pointer )
+    }
+    unallocated += brk - heap.ads[pointer]
+    brk = heap.ads[pointer]
+    next = pointer
+  }
+
+  function extend(needed){
+    var cl  = heap.data.length
+    var nl = max(cl * 2, cl - unallocated + needed)
+    if ( nl >= Math.pow(2, heap.ads.BYTES_PER_ELEMENT) ) {
+      heap.ads = resize(heap.ads, heap.ads.length * 2, nl)
+    }
+    var update = resize_naive(heap.ads, next, heap.data, nl)
+    heap.data = update.data
+    heap.ads = update.ads
+    brk = update.brk
+    unallocated = heap.data.length - brk - 1
+  }
+
+  return heap
+}
+
+
+var naives = Naive(Uint32Array, Math.pow(2,12) , false)
+var consts = Constant(Uint32Array, 8, false)
+var stacks = Stack(Uint32Array, Math.pow(2,12), false)
+
+var number_uid = 0
+var pointers = [] // this can be a typedarray
+var values = [] // this no, because has to store the object references
+
+function heap_factory(t){
+  return function(size){
+    var pointer = t.alloc(size)
+    var didx = t.ads[pointer]
+    t.data[didx] = size
+    number_uid = number_uid + 1
+    pointers[number_uid] = pointer
+    values[number_uid] = t
+    return number_uid
+  }
+}
+
+var numbers = heap_factory(naives)
+var constants = heap_factory(consts)
+var temp = heap_factory(stacks)
 
 
 var zero = constants(2)
@@ -37,8 +259,8 @@ t_β.data[didx_β + 2] = 0 // value
 t_β.data[didx_β + 3] = 1 // value
 
 function to_int(num, storage){
-  if ( num == 0 ) return zero
-  if ( num == 1 ) return one
+  if ( num === 0 ) return zero
+  if ( num === 1 ) return one
   storage = storage || numbers
 
   var size_r = 3 + floor(logn(num) / logn2_26)
@@ -165,7 +387,7 @@ function subtract(A_idx, B_idx, storage){
   storage = storage || numbers
 
   var comp = compare_abs(A_idx, B_idx)
-  if ( comp == 0 ) {
+  if ( comp === 0 ) {
     return zero
   } else if ( comp < 0 ) {
     // TODO
@@ -225,7 +447,7 @@ function subtract(A_idx, B_idx, storage){
   data_r[didx_r + i] += carry
 
   var trailing_zeroes = 0
-  while ( data_r[didx_r + (--i)] == 0 && i > 1) {
+  while ( data_r[didx_r + (--i)] === 0 && i > 1) {
     trailing_zeroes++
   }
   if ( trailing_zeroes ) data_r[didx_r] = size_r - trailing_zeroes
@@ -282,7 +504,7 @@ function multiply(A_idx, B_idx, storage) {
 
   var trailing_zeroes = 0
   var k = size_a + size_b - 3 + didx_t
-  while ( k > didx_t + 2 && data_t[k] == 0) {
+  while ( k > didx_t + 2 && data_t[k] === 0) {
     k--
     trailing_zeroes++
   }
@@ -294,8 +516,8 @@ function multiply(A_idx, B_idx, storage) {
     var R_idx = storage(size_r)
 
     var t_r = values[R_idx]
-    data_r = t_r.data
-    didx_r = t_r.ads[pointers[R_idx]]
+    var data_r = t_r.data
+    var didx_r = t_r.ads[pointers[R_idx]]
     for ( var l = 0; l < size_r; l++ ) {
       data_r[didx_r + l] = data_t[didx_t + l]
     }
@@ -356,7 +578,7 @@ function left_shift(I_idx, n, storage){
 
 function right_shift(I_idx, n, storage){
   if ( equal(I_idx, zero) ) return zero
-  if ( n == 0 ) return I_idx
+  if ( n === 0 ) return I_idx
   storage = storage || numbers
   var words = (n / 26) | 0 
   var bits = n % 26
@@ -385,7 +607,7 @@ function right_shift(I_idx, n, storage){
 
   var trailing_zeroes = 0
   var k = didx_r + size_r - 1
-  while ( k > didx_r + 2 && data_r[k] == 0) {
+  while ( k > didx_r + 2 && data_r[k] === 0) {
     k--
     trailing_zeroes++
   }
@@ -493,7 +715,7 @@ function slowdiv(A_idx, B_idx){
     if ( m == n ) {
       var c = compare_abs(As_idx, Bs_idx)
       if ( c < 0 ) return [zero, A_idx]
-      if ( c == 0 ) return [one, zero]
+      if ( c === 0 ) return [one, zero]
       return [one, subtract(A_idx, B_idx, temp)]
     }
 
@@ -526,7 +748,7 @@ function slowdiv(A_idx, B_idx){
     if ( m == n ) {
       var c = compare_abs(A_idx, B_idx)
       if ( c < 0 ) return [zero, A_idx]
-      if ( c == 0 ) return [one, zero]
+      if ( c === 0 ) return [one, zero]
       return [one, subtract(A_idx, B_idx, temp)]
     }
 
@@ -561,10 +783,10 @@ function divide(dividend, divisor, storage){
   var Q_idx = storage(size_q)
   var pointer_Q = pointers[Q_idx]
   var t_Q = values[Q_idx]
-  data_q = t_q.data
-  didx_q = t_q.ads[pointer_q]
-  data_Q = t_Q.data
-  didx_Q = t_Q.ads[pointer_Q]
+  var data_q = t_q.data
+  var didx_q = t_q.ads[pointer_q]
+  var data_Q = t_Q.data
+  var didx_Q = t_Q.ads[pointer_Q]
   for ( var l = 0; l < size_q; l++ ) {
     data_Q[didx_Q + l] = data_q[didx_q + l]
   }
@@ -572,10 +794,10 @@ function divide(dividend, divisor, storage){
   var R_idx = storage(size_r)
   var pointer_R = pointers[R_idx]
   var t_R = values[R_idx]
-  data_r = t_r.data
-  didx_r = t_r.ads[pointer_r]
-  data_R = t_R.data
-  didx_R = t_R.ads[pointer_R]
+  var data_r = t_r.data
+  var didx_r = t_r.ads[pointer_r]
+  var data_R = t_R.data
+  var didx_R = t_R.ads[pointer_R]
   for ( var l = 0; l < size_r; l++ ) {
     data_R[didx_R + l] = data_r[didx_r + l]
   }
@@ -634,7 +856,7 @@ var ten = to_int(10000)
 var pot = [one, ten]
 
 function power_of_ten(i){
-  if ( pot[i] != null ) return pot[i]
+  if ( pot[i] !== null ) return pot[i]
   for ( var k = pot.length; k <= i; k++ ) {
     // there is not much sense in caching if it will be cleared
     pot[k] = multiply(pot[k - 1], ten, numbers) 
@@ -646,8 +868,8 @@ function parse_base10(str, storage){
   var r = zero
   var i = 0
   while ( str.length ) {
-    r = i == 0 ? to_int(Number(str.slice(-4)), temp)
-      :          add(r, multiply(to_int(Number(str.slice(-4)), temp), power_of_ten(i), temp), temp)
+    r = i === 0 ? to_int(Number(str.slice(-4)), temp)
+      :           add(r, multiply(to_int(Number(str.slice(-4)), temp), power_of_ten(i), temp), temp)
     str = str.slice(0, -4)
     i++
   }
@@ -661,11 +883,11 @@ function parse_base10(str, storage){
 
     var pointer_R = pointers[R_idx]
     var t_R = values[R_idx]
-    data_R = t_R.data
-    didx_R = t_R.ads[pointer_R]
+    var data_R = t_R.data
+    var didx_R = t_R.ads[pointer_R]
 
-    data_r = t_r.data
-    didx_r = t_r.ads[pointer_r]
+    var data_r = t_r.data
+    var didx_r = t_r.ads[pointer_r]
 
     for ( var l = 0; l < size_r; l++ ) {
       data_R[didx_R + l] = data_r[didx_r + l]
@@ -727,7 +949,6 @@ function print(n, idx){
   var data = t.data
   var didx = t.ads[pointer]
   var v = []
-  var a = 0
   var guard = 1000
   var size = data[didx]
   if ( size < 2 ) {
@@ -750,19 +971,19 @@ function compare(a, b){
 
 
   var t_a = values[a]
-  data_a = t_a.data
-  didx_a = t_a.ads[pointers[a]]
+  var data_a = t_a.data
+  var didx_a = t_a.ads[pointers[a]]
   if ( data_a[didx_a] == 2 ) return 0
   var na = ( data_a[didx_a + 1] & 1 ) 
 
   var t_b = values[b]
-  data_b = t_b.data
-  didx_b = t_b.ads[pointers[b]]
+  var data_b = t_b.data
+  var didx_b = t_b.ads[pointers[b]]
   if ( data_b[didx_b] == 2 ) return 0
   var nb = ( data_b[didx_b + 1] & 1 ) 
 
-  return !(na + nb)       ? na < nb 
-       : /* same sign */    compare_abs(a, b) * (na || 1)
+  return na + nb === 0   ? na < nb 
+       : /* same sign */   compare_abs(a, b) * (na || 1)
 
 }
 
@@ -770,14 +991,14 @@ function addition(a, b, storage){
   storage = storage || numbers
 
   var t_a = values[a]
-  data_a = t_a.data
-  didx_a = t_a.ads[pointers[a]]
+  var data_a = t_a.data
+  var didx_a = t_a.ads[pointers[a]]
   var na = ( data_a[didx_a + 1] & 1 ) 
   if ( data_a[didx_a] == 2 ) return b 
 
   var t_b = values[b]
-  data_b = t_b.data
-  didx_b = t_b.ads[pointers[b]]
+  var data_b = t_b.data
+  var didx_b = t_b.ads[pointers[b]]
   var nb = ( data_b[didx_b + 1] & 1 ) 
   if ( data_b[didx_b] == 2 ) return a 
 
@@ -796,8 +1017,8 @@ function addition(a, b, storage){
   }
 
   var t_r = values[r]
-  data_r = t_r.data
-  didx_r = t_r.ads[pointers[r]]
+  var data_r = t_r.data
+  var didx_r = t_r.ads[pointers[r]]
   if ( data_r[didx_r] > 2 ) {
     data_r[didx_r + 1] = na
   }
@@ -808,20 +1029,20 @@ function addition(a, b, storage){
 function subtraction(a, b, storage){
   storage = storage || temp
   var t_b = values[b]
-  data_b = t_b.data
-  didx_b = t_b.ads[pointers[b]]
+  var data_b = t_b.data
+  var didx_b = t_b.ads[pointers[b]]
   if ( data_b[didx_b] == 2 ) return a
   var t_a = values[a]
-  data_a = t_a.data
-  didx_a = t_a.ads[pointers[a]]
-  var a_is_zero = data_b[didx_b] == 2 ? true : false
+  var data_a = t_a.data
+  var didx_a = t_a.ads[pointers[a]]
+  var a_is_zero = data_a[didx_a] == 2 ? true : false
   var subtrahend = clone(b, a_is_zero ? storage : temp)
 
   var nb = ( data_b[didx_b + 1] & 1 ) 
 
   var t_s = values[subtrahend]
-  data_s = t_s.data
-  didx_s = t_s.ads[pointers[subtrahend]]
+  var data_s = t_s.data
+  var didx_s = t_s.ads[pointers[subtrahend]]
   data_s[didx_s + 1] = nb ? 0 : 1
   
   return a_is_zero ? subtrahend : addition(a, subtrahend, storage)
@@ -951,7 +1172,17 @@ arb.compare = compare
 
 arb.equal = equal
 
-arb.memory = memory
+arb.memory = { naives: naives
+             , consts: consts
+             , stacks: stacks
+
+             , numbers: numbers
+             , constants: constants
+             , temp: temp
+
+             , values: values
+             , pointers: pointers
+             }
 
 arb.print = print
 

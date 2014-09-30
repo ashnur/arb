@@ -1,6 +1,7 @@
 var rn = require('random-number')
 var rint = rn.generator({integer: true})
-var memory = require('../../memory.js')
+var integer = require('../../integer.js')
+var memory = integer.memory
 var numbers = memory.numbers
 var temp = memory.temp
 var values = memory.values

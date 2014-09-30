@@ -1,6 +1,7 @@
-var memory = require('../memory.js')
+/*jshint asi:true, laxcomma:false*/
 
 var integer = require('../integer.js')
+var memory = integer.memory
 
 var add = integer.add
 var subtract = integer.subtract
@@ -91,19 +92,20 @@ function commutativity_add(a, b){
 
 function identity(a){
   if ( !equal(add(a, zero), a) ) {
-    console.log(11)
     throw new Error('a + 0')
   }
   if ( !equal(add(zero, a), a) ) {
-    console.log(2)
     throw new Error('0 + a')
   }
   if ( !equal(subtract(a, zero), a) ) {
-    console.log(3)
     throw new Error('a - 0')
   }
-  if ( !equal(multiply(a, one), a) ) {
-    console.log(4)
+  var z = multiply(a, one)
+  if ( !equal(z, a) ) {
+    print('a', a)
+    print('one', one)
+    print('a', a)
+    print('z', z)
     throw new Error('0 - a')
   }
   return true
@@ -279,17 +281,15 @@ function topolynom(a){
   return '(' + toarr(a).map(topoly).join('+') + ')'
 }
 
-var times = 10
-while (times -- > 0) {
+//var times = 10
+//while (times -- > 0) {
   klara(1000, props)
-}
+//}
 
 var arr_to_int = integer.arr_to_int
-//// var a = arr_to_int(, true)
-//// var b = arr_to_int(, true)
 
 ;[
-  [[3, 1, 35107450], [3, 1, 3239272]],
+//  [[3, 1, 35107450], [3, 1, 3239272]],
 ].forEach(function(args){
   var a = arr_to_int(args[0], true)
   var b = arr_to_int(args[1], true)

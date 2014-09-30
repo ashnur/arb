@@ -1,4 +1,5 @@
-var memory = require('../../memory.js')
+var arb = require('../../integer.js')
+var memory = arb.memory
 var pointers = memory.pointers
 var values = memory.values
 

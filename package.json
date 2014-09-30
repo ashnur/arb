@@ -27,7 +27,7 @@
   "license": "BSD-2-Clause",
   "devDependencies": {
     "biginteger": "^1.0.3",
-    "bluebird": "^2.3.2",
+    "bluebird": "^2.3.4",
     "claire": "^0.4.1",
     "liberate": "^1.0.1",
     "microtime": "^1.0.1",

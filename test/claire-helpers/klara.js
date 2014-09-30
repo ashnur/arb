@@ -6,7 +6,8 @@ var claire = require('claire')
 var for_all = claire.forAll
 var check = claire.check
 
-var memory = require('../../memory.js')
+var integer = require('../../integer.js')
+var memory = integer.memory
 var debug = require('../../debug.js')
 
 //claire.Report.toString = function(){

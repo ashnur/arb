@@ -5,7 +5,6 @@ var liberate = require('liberate')
 var map = liberate(Array.prototype.map)
 var filter = liberate(Array.prototype.filter)
 var max = Math.max
-var microtime = require('microtime')
 
 var start = μ()
 
@@ -86,7 +85,8 @@ function below(limit){ return function(_,i){ return i < limit } }
 function between(from, to){ return function(_,i){ return i >= from && i <= to } }
 
 function μ(){
-return microtime.now()
+return 0
+//return microtime.now()
 }
 
 
