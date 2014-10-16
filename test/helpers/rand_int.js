@@ -1,11 +1,6 @@
+var arb = require('../../integer.js')
 var rn = require('random-number')
 var rint = rn.generator({integer: true})
-var integer = require('../../integer.js')
-var memory = integer.memory
-var numbers = memory.numbers
-var temp = memory.temp
-var values = memory.values
-var pointers = memory.pointers
 
 var rand_bool = rn.bind(null, {integer:true})
 var rand_small_nat = rn.bind(null, {min: 1, max: 5, integer:true})
@@ -19,28 +14,19 @@ function random_bigint(l, s, bigit){
   var minlength = l[0] + 2
   var maxlength = Math.max(minlength, l[1])
   var bigit_count = rint(minlength, maxlength)
-  var idx = temp(bigit_count)
-  var pointer = pointers[idx]
-  var t = values[idx]
-  var didx = t.ads[pointer]
-
-  t.data[didx + 1] = 0 // type
-  if ( bigit_count > 2 ) { 
-    t.data[didx + 1] = s == null ? rint(0, 1) : s
-  }
+  var arr = [bigit_count, bigit_count > 2 ? (s == null ? rint(0, 1) : s) : 0]
 
   for ( var i = 2; i < bigit_count; i ++ ) {
     if ( i == bigit_count -1 ) {
       var min = bigit[0] == 0 ? 1 : bigit[0]
       var max = bigit[1] == 0 ? 1 : bigit[1]
-      t.data[didx + i] = rint(min, max) // set min max on the integer generator
+      arr[i] = rint(min, max) // set min max on the integer generator
     } else {
-      t.data[didx + i] = rint(bigit[0], bigit[1]) // set min max on the integer generator
+      arr[i] = rint(bigit[0], bigit[1]) // set min max on the integer generator
     }
   }
-
-
-  return idx
+//  console.log('arr', arr)
+  return arb.arr_to_int(arr)
 }
 
 function bigint_generator(size, complexity, sign){

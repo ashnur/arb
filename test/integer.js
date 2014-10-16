@@ -1,4 +1,5 @@
 /*jshint asi:true, laxcomma:false*/
+var console_log = console.log.bind(console)
 
 var integer = require('../integer.js')
 var memory = integer.memory
@@ -13,26 +14,37 @@ var equal = integer.equal
 var claire = require('claire')
 var as_generator = claire.asGenerator
 var rand_int = require('./helpers/rand_int.js')
-var Integer = as_generator(rand_int.static_generator([0,20], 'complex', 'negative'))
+var get_random_bigint = rand_int.static_generator([0,10], 'simple', 'negative')
+//var get_random_bigint = rand_int.static_generator([0,3], 'simple', 'negative')
+var Integer = as_generator(get_random_bigint)
 var liberate = require('liberate')
 var join = liberate(Array.prototype.join)
-var log = console.log.bind(console)
 var analyzer = require('./claire-helpers/analyzer.js')
 var klara = require('./claire-helpers/klara.js')
 
 var zero = integer.zero
 var one = integer.one
 
+var clone = integer.clone
 var print = integer.print
 
+var debug = require('../debug.js')
+
 function subtract_sum(n, m, k){
+  // save state adr heap
+  ///var pre = {a: debug.dump(memory.adrs()), h: debug.dump(memory.heap()) }
   var n_m = subtract(n, m)
   var n_m_k = subtract(n_m, k)
   var mk = add(m, k)
   var n_mk = subtract(n, mk)
   var r = equal(n_mk, n_m_k)
   if ( ! r ) {
-    log('n-(m+k) == n - m - k')
+    // show saved state and current state
+    //console_log('pre adrs: ', pre.a)
+    //console_log('cur adrs: ', debug.dump(memory.adrs()))
+    //console_log('pre heap: ', pre.h)
+    //console_log('cur heap: ', debug.dump(memory.heap()))
+    console_log('n-(m+k) == n - m - k')
     print('n', n)
     print('m', m)
     print('k', k)
@@ -204,106 +216,135 @@ var props = [
   // , fn: variety
   // , args: [claire.data.Array(Integer)
   // }
-, { title : 'identity'
-  , fn: identity
-  , args: [Integer]
-  , analyze: analyzer(bigint_analyzer)
-  , end: function(){  }
-  }
-,
-  { title : 'additive commutativity'
-  , fn: commutativity_add
-  , args: [Integer, Integer]
-  , analyze: analyzer(bigint_analyzer, bigint_analyzer)
-  , end: function(){  }
-  }
-,
-  { title : 'additive associativity'
-  , fn: associativity_add
-  , args: [Integer, Integer, Integer]
-  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-  , end: function(){  }
-  }
-, { title : 'subtract_sum'
-  , fn: subtract_sum
-  , args: [Integer, Integer, Integer]
-  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-  , end: function(){  }
-  }
-, { title : 'add_difference'
-  , fn: add_difference
-  , args: [Integer, Integer, Integer]
-  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-  , end: function(){  }
-  }
-, { title : 'subtract_difference'
-  , fn: subtract_difference
-  , args: [Integer, Integer, Integer]
-  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-  , end: function(){  }
-  }
-, { title : 'multiplicative commutativity'
-  , fn: commutativity_mul
-  , args: [Integer, Integer]
-  , analyze: analyzer(bigint_analyzer, bigint_analyzer)
-  , end: function(){  }
-  }
-, { title : 'multiplicative associativity'
-  , fn: associativity_mul
-  , args: [Integer, Integer, Integer]
-  , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
-  , end: function(){  }
-  }
-, 
-{ title : 'division back substitution'
-  , fn: back_substitution_div
-  , args: [Integer, Integer]
-  , analyze: analyzer(bigint_analyzer, bigint_analyzer)
-  , end: function(){  }
-  }
+    { title : 'identity'
+   , fn: identity
+   , args: [Integer]
+   , analyze: analyzer(bigint_analyzer)
+   , end: function(){  }
+   }
+ ,
+   { title : 'additive commutativity'
+   , fn: commutativity_add
+   , args: [Integer, Integer]
+   , analyze: analyzer(bigint_analyzer, bigint_analyzer)
+   , end: function(){  }
+   }
+ ,
+   { title : 'additive associativity'
+   , fn: associativity_add
+   , args: [Integer, Integer, Integer]
+   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
+   , end: function(){  }
+   }
+ , { title : 'subtract_sum'
+   , fn: subtract_sum
+   , args: [Integer, Integer, Integer]
+   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
+   , end: function(){  }
+   }
+ , { title : 'add_difference'
+   , fn: add_difference
+   , args: [Integer, Integer, Integer]
+   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
+   , end: function(){  }
+   }
+ , 
+   { title : 'subtract_difference'
+   , fn: subtract_difference
+   , args: [Integer, Integer, Integer]
+   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
+   , end: function(){  }
+   }
+ , { title : 'multiplicative commutativity'
+   , fn: commutativity_mul
+   , args: [Integer, Integer]
+   , analyze: analyzer(bigint_analyzer, bigint_analyzer)
+   , end: function(){  }
+   }
+ , { title : 'multiplicative associativity'
+   , fn: associativity_mul
+   , args: [Integer, Integer, Integer]
+   , analyze: analyzer(bigint_analyzer, bigint_analyzer, bigint_analyzer)
+   , end: function(){  }
+   }
+ , 
+   { title : 'division back substitution'
+   , fn: back_substitution_div
+   , args: [Integer, Integer]
+   , analyze: analyzer(bigint_analyzer, bigint_analyzer)
+   , end: function(){  }
+   }
 ]
 
 function topoly(c, p){ return c + '*' + '(2^26)^' + p }
 function toarr(id){
-  var t = memory.values[id]
-  var p = memory.pointers[id]
-  var data = t.data
-  var didx = t.ads[p]
+  var p = memory.adrs(id)
   var arr = []
-  var size = data[didx]
-  var idx = didx + 2
-  while ( idx < didx + size ) {
-    arr.push(data[idx++])
+  var size = memory.heap(p)
+  var i = p + 2
+  while ( i < p + size ) {
+    arr.push(memory.heap(i++))
   }
   return arr
 }
 function topolynom(a){
-  return '(' + toarr(a).map(topoly).join('+') + ')'
+  var sign = (memory.heap(memory.adrs(a)+1) & 1) ? '-' : '+' 
+  return '(' + sign + toarr(a).map(topoly).join(sign) + ')'
 }
 
-//var times = 10
-//while (times -- > 0) {
-  klara(1000, props)
-//}
 
 var arr_to_int = integer.arr_to_int
+// backsub 
+//  var T = divide(a, b)
+//  var q = T[0]
+//  var r = T[1]
+//  var s = add(multiply(q, b), r)
 
-;[
-//  [[3, 1, 35107450], [3, 1, 3239272]],
-].forEach(function(args){
-  var a = arr_to_int(args[0], true)
-  var b = arr_to_int(args[1], true)
+  /* subtraction
+  var n = args[0]
+  var m = args[1]
+  var k = args[2]
+  //console_log(debug.dump(memory.adrs()))
+  //console_log(debug.dump(memory.heap()))
 debugger
-  var T = divide(a, b)
-  var q = T[0]
-  var r = T[1]
-  var s = add(multiply(q, b), r)
-  if ( ! equal (s, a) ) { 
-    print('a', a)
-    print('b', b)
-    print('q', q)
-    print('r', r)
-    print('s', s)
+  var n_m = subtract(n, m)
+  print('n_m', n_m)
+  //console_log(debug.dump(memory.heap()))
+  var n_m_k = subtract(n_m, k)
+  print('n_m_k', n_m_k)
+  var mk = add(m, k)
+  print('mk', mk)
+  var n_mk = subtract(n, mk)
+  print('n_mk', n_mk)
+  */
+
+
+//;[
+////  [get_random_bigint(), get_random_bigint()]
+//].forEach()
+
+//var times = 1000000
+//
+//while ( times-- > 0 ) {
+//  bang(get_random_bigint(), get_random_bigint(), get_random_bigint())
+//}
+
+function bang(a, b, c){
+  
+  if ( !back_substitution_div(a, b) ) {
+    console_log('n', topolynom(a))
+    console_log('m', topolynom(b))
+    //console_log('k', topolynom(c))
+    var ac = clone(a)
+    var bc = clone(b)
+    //var cc = clone(a)
+    console.log('check', back_substitution_div(ac, bc))
     throw new Error('failed')
   }
-})
+}
+
+
+var times = 10
+while (times -- > 0) {
+  klara(3000, props)
+}

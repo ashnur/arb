@@ -1,12 +1,7 @@
 var arb = require('../../integer.js')
-var memory = arb.memory
-var pointers = memory.pointers
-var values = memory.values
 
-function describeSize(idx){
-  var pointer = pointers[idx]
-  var t = values[idx]
-  var idx = t.data[pointer]
+function describeSize(I){
+  var size = arb.int_size(I)
   return size < 4              ? [0 , 'tiny']
        : size >= 4 && size < 8 ? [1 , 'small']
        :                         [2 , 'large']
@@ -14,24 +9,20 @@ function describeSize(idx){
 
 var size = { name: 'size' , describe: describeSize }
 
-function describeComplexity(idx){
-  var pointer = pointers[idx]
-  var t = values[idx]
-  var data = t.data
-  var didx = t.ads[pointer]
-  var size = t.data[didx]
-  for ( var i = didx + 2; i < didx + size ; i++ ) {
-    if ( data[i] > 9  ) return [1, 'complex']
+function describeComplexity(I){
+  var arr = arb.int_to_arr(I)
+  for ( var i = 2; i < arr[0] ; i++ ) {
+    if ( arr[i] > 9  ) return [1, 'complex']
   }
   return [0, 'simple']
 }
 
 var complexity = { name: 'complexity' , describe: describeComplexity }
 
-function describeSign(idx){
-  var t = values[idx]
-  var sign = t.data[t.ads[pointers[idx]]+1] & 1
-  return [Number(s), s ? 'integer' : 'positive']
+function describeSign(I){
+  var arr = arb.int_to_arr(I)
+  var sign = arr[1] & 1
+  return [sign, sign ? 'integer' : 'positive']
 }
 
 var s = { name: 'sign' , describe: describeSign}
