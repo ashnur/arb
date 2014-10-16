@@ -112,15 +112,16 @@ function Stack(type, size, silent){
 }
 
 var stack = Stack(Uint32Array, 1, false)
+var alloc = stack.alloc
 
-var zero = stack.alloc(2)
+var zero = alloc(2)
 heap[adrs[zero] + 1] = 0
 
-var one = stack.alloc(3)
+var one = alloc(3)
 heap[adrs[one] + 1] = 0
 heap[adrs[one] + 2] = 1
 
-var β  = stack.alloc(4)
+var β  = alloc(4)
 heap[adrs[β] + 1] = 0
 heap[adrs[β] + 2] = 0
 heap[adrs[β] + 3] = 1
@@ -132,7 +133,7 @@ function to_int(num){
 
   var size_r = 3 + floor(logn(num) / logn2_26)
 
-  var R = stack.alloc(size_r)
+  var R = alloc(size_r)
   var Rp = adrs[R]
   heap[Rp + 1] = 0 // type integer
   for ( var i = 2; i < size_r; i++ ) {
@@ -143,7 +144,7 @@ function to_int(num){
 }
 
 function arr_to_int(arr){
-  var R = stack.alloc( arr[0] )
+  var R = alloc( arr[0] )
   var Rp = adrs[R]
   for( var i = 1; i < arr.length; i++ ) {
     heap[Rp + i] = arr[i]
@@ -177,7 +178,7 @@ function add(A, B){
   var size_b = heap[adrs[B]]
 
   var size_r = size_b + 1
-  var R = stack.alloc(size_r)
+  var R = alloc(size_r)
   var Rp = adrs[R]
   heap[Rp + 1] = 0 // type integer
   heap[Rp + size_r - 1] = 0 // possible garbage cleanup
@@ -222,7 +223,7 @@ function subtract(A, B){
 
   var size_r = heap[adrs[A]]
 
-  var R = stack.alloc(size_r)
+  var R = alloc(size_r)
   var Rp = adrs[R]
 
   var Ap = adrs[A]
@@ -274,7 +275,7 @@ function multiply(A, B) {
 
   // header(2 blocks) is in both, so has to be removed
   var size_r = size_a + size_b - 2
-  var R = stack.alloc(size_r) 
+  var R = alloc(size_r) 
   var Rp = adrs[R]
   var Ap = adrs[A]
   var Bp = adrs[B]
@@ -324,7 +325,7 @@ function left_shift(I, n){
   // and depending on the most significant bigit's size 1 or 0 more
   var msdi = heap[adrs[I] + size_i - 1]
   var bits_word = ((msdi * Math.pow(2,bits)) > 0x3ffffff ? 1 : 0)
-  var R = stack.alloc(size_i + words + bits_word)
+  var R = alloc(size_i + words + bits_word)
   var Rp = adrs[R]
   heap[Rp + 1] = 0 // type integer
 
@@ -365,7 +366,7 @@ function right_shift(I, n){
   var size_r = size_i - words - bit_offset 
   if ( size_r < 2 ) throw new Error('you shifted so much to the right, you came back on the left!')
 
-  var R = stack.alloc(size_r)
+  var R = alloc(size_r)
   var Rp = adrs[R]
   heap[Rp + 1] = 0 // type integer
 
@@ -388,7 +389,7 @@ function right_shift(I, n){
 
 function sub(A, B){
   var size_b = heap[adrs[B]]
-  var BR = stack.alloc(size_b + 1)
+  var BR = alloc(size_b + 1)
   var Bp = adrs[B]
   var BRp = adrs[BR]
   heap[BRp + 1] = 0 // type integer
@@ -415,7 +416,7 @@ function sub(A, B){
   var q = floor((base * heap[Ap + size_a - 1] + heap[Ap + size_a - 2]) / heap[adrs[B] + size_b - 1])
 
   if ( q > base - 1 ) q = base - 1
-  var Q = stack.alloc(3)
+  var Q = alloc(3)
   var Qp = adrs[Q]
   heap[Qp + 1] = 0 // type integer
   heap[Qp + 2] = q // value
@@ -432,7 +433,7 @@ function sub(A, B){
     var T = subtract(T, B)
   }
   if ( corrected ) {
-    var Q = stack.alloc(3)
+    var Q = alloc(3)
     var Qp = adrs[Q]
     heap[Qp + 1] = 0 // type integer
     heap[Qp + 2] = q // value
@@ -450,11 +451,9 @@ function divide(A, B){
     var As = left_shift(A, shifted)
     var Bs = left_shift(B, shifted)
 
-    var Asp = adrs[As]
-    var m = heap[adrs[Asp]]
+    var m = heap[adrs[As]]
 
-    var Bsp = adrs[Bs]
-    var n = heap[adrs[Bsp]]
+    var n = heap[adrs[Bs]]
 
     if ( m < n ) {
       return [zero, A]
@@ -481,11 +480,9 @@ function divide(A, B){
 
   } else {
 
-    var Ap = adrs[A]
-    var m = heap[adrs[Ap]]
+    var m = heap[adrs[A]]
 
-    var Bp = adrs[Bp]
-    var n = heap[adrs[Bp]]
+    var n = heap[adrs[B]]
 
     if ( m < n ) {
       return [zero, A]
@@ -598,7 +595,7 @@ function to_base10(bigint){
 
 function clone(I){
   var size = heap[adrs[I]]
-  var C = stack.alloc(size)
+  var C = alloc(size)
   var Ip = adrs[I]
   var Cp = adrs[C]
 
@@ -627,9 +624,6 @@ function print(name, I){
   //return console_log('[', v.join(' , '), ']')
 }
 
-//global.print = print
-
-
 function compare(A, B){
   var signA = ( heap[adrs[A] + 1] & 1 ) 
   var signB = ( heap[adrs[B] + 1] & 1 ) 
@@ -648,7 +642,6 @@ function addition(A, B){
   var signB = ( heap[Bp + 1] & 1 ) 
 
   if ( signA === signB ) {
-    //console.log(6.1)
     var R = add(A, B)
   } else {
     if ( compare_abs(A, B) === -1 ) {
@@ -758,6 +751,45 @@ function lcm(a, b){
   return division(abs(multiplication(a, b)), gcd(a,b))
 }
 
+function arr_to_arr(fn, a, b){
+  var mark = alloc(2)
+  var A = arr_to_int(a)
+  var B = arr_to_int(b)
+  var R = fn(A, B)
+  var r = int_to_arr(R)
+  stack.free(mark)
+  return r
+}
+
+function arr_2to_primitive(fn, a, b){
+  var mark = alloc(2)
+  var A = arr_to_int(a)
+  var B = arr_to_int(b)
+  var r = fn(A, B)
+  stack.free(mark)
+  return r
+}
+
+global.print = print
+
+var through_arrays = {
+  add: arr_to_arr.bind(null, addition)
+, subtract: arr_to_arr.bind(null, subtraction)
+, multiply: arr_to_arr.bind(null, multiplication)
+, divide: function(a, b){ 
+    var mark = alloc(2)
+    var A = arr_to_int(a)
+    var B = arr_to_int(b)
+    var QuotientRemainder = division(A, B)
+    var r = [int_to_arr(QuotientRemainder[0]), int_to_arr(QuotientRemainder[1])]
+    stack.free(mark)
+    return r
+  }
+, compare_abs : arr_2to_primitive.bind(null, compare_abs)
+, compare : arr_2to_primitive.bind(null, compare)
+, equal : arr_2to_primitive.bind(null, equal)
+}
+
 var arb = {
   add : addition
 , subtract : subtraction
@@ -781,6 +813,7 @@ var arb = {
 , memory : stack
 , print : print
 , clone : clone
+, arr: through_arrays
 }
 
 module.exports = arb
