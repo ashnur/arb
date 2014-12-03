@@ -1,10 +1,6 @@
-I think the original idea ( using Uint16Array heap for bigits, which is maintained through a linked list typedarray) is viable, but currently the alloc/free part poses a serious block. It seems to me that any kind of free() at runtime hinders performance too much. 
+Performance is now on par with any other bigint library on the web, although I am fairly sure that the approach has still a lot of potential if micro-optimized.
 
-I see two possible solutions to this.
+However my end-goal is to construct rational nubers, polynumbers and matrices of polynumbers using this lib,
+which in itself should provide a performance improvement over just building objects/arrays with any bigint library as fields/elements.
 
-- some kind of async free which doesn't conflict with alloc()
-- using a stack for internal values and reimplementing the operations to work on that
-  this would help because free() on a stack is very fast
-
-
-also, if I could remove the set to 0 from free, and write the operations to not expect chunks/bigits set to 0, that would possible help a bit with the performance too.
+Anyhow, if someone sees an obvious way to further improve performance, please let me know.
